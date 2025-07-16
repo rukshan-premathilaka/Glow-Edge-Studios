@@ -39,9 +39,14 @@ class DBHandle
     public static function query(string $sql, array $params = []): array|bool
     {
         $stmt = self::connect()->prepare($sql);
-        $stmt->execute($params);
 
-        // Auto-detect if it's SELECT or not
+        try {
+            $stmt->execute($params);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+
         if (str_starts_with(strtoupper(trim($sql)), 'SELECT')) {
             return $stmt->fetchAll();
         }

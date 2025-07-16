@@ -33,7 +33,7 @@
             echo $token->getInputHtml();
         ?>
         <button type="submit">Register</button>
-        <a href="/user/login">Already have an account</a>
+        <a href="/user/signing">Already have an account</a>
     </form>
 
 

@@ -10,7 +10,7 @@ class CsrfToken
     protected string $tokenName = '_csrf_token';
 
     // Generate or get existing token
-    public function generate(): string
+    public function generateCSRF(): string
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -28,7 +28,7 @@ class CsrfToken
     }
 
     // Validate incoming token
-    public function validate(?string $token): bool
+    public function validateCSRF(?string $token): bool
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -42,7 +42,7 @@ class CsrfToken
     }
 
     // Clear token
-    public function clear(): void
+    public function clearCSRF(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -54,6 +54,6 @@ class CsrfToken
     // Get HTML input tag
     public function getInputHtml(): string
     {
-        return '<input type="hidden" name="' . $this->tokenName . '" value="' . $this->generate() . '" />';
+        return '<input type="hidden" name="' . $this->tokenName . '" value="' . $this->generateCSRF() . '" />';
     }
 }

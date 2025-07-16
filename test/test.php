@@ -1,11 +1,12 @@
 <?php
 
 
-use core\DBHandle;
+$password = 'mySecret123mySecret123mySecret123mySecret123mySecret123';
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+echo $hashedPassword;
 
-// SELECT Example
-$users = DBHandle::query("SELECT * FROM user",);
-
-echo "<pre>";
-print_r($users);
-echo "</pre>";
+if (password_verify($password, $hashedPassword)) {
+    echo 'Password is valid!';
+} else {
+    echo 'Invalid password.';
+}

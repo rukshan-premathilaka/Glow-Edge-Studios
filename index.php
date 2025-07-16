@@ -28,12 +28,12 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
     $r->get('/signup', function () {
         require 'views/user/signup.php';
     });
-    $r->get('/login', function () {
+    $r->get('/signing', function () {
         require 'views/user/signing.php';
     });
 
     $r->post('/signup',  [User::class, 'create']);
-    $r->Post('/signing',  [User::class, 'login']);
+    $r->Post('/signing',  [User::class, 'authorize']);
 });
 
 
