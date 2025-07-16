@@ -15,7 +15,13 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $router = new RouteCollector();
 
-
+/* --- TEST --- */
+$router->get('/home', function () {
+    require 'views/home.php';
+});
+$router->get('/t', function () {
+    require 'test/test.php';
+});
 
 /* --- USER ROUTE GROUP --- */
 $router->group(['prefix' => 'user'], function (RouteCollector $r) {

@@ -26,6 +26,12 @@
             Enter your password
             <input type="password" name="re_password" required placeholder="Password"><br>
         </label>
+        <?php
+            // CSRF
+            require "vendor/autoload.php";
+            $token = new csrf\CsrfToken();
+            echo $token->getInputHtml();
+        ?>
         <button type="submit">Register</button>
         <a href="/user/login">Already have an account</a>
     </form>

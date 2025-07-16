@@ -6,6 +6,7 @@
     "autoload": {
         "psr-4": {
             "controller\\": "src/controller/",
+            "core\\": "src/core/",
             "csrf\\": "src/csrf/"
         }
     },
@@ -17,7 +18,8 @@
     ],
     "require": {
         "php": "^8.2",
-        "phroute/phroute": "^2.2"
+        "phroute/phroute": "^2.2",
+        "respect/validation": "^2.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0",

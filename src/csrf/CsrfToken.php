@@ -4,6 +4,7 @@ namespace csrf;
 
 use Random\RandomException;
 
+
 class CsrfToken
 {
     protected string $tokenName = '_csrf_token';
