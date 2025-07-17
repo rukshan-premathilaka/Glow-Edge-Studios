@@ -2,6 +2,8 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    background: #242424;
+    color: #a9a9a9;
 }
 
 .screen-size {

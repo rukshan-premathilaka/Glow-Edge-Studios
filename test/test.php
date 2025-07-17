@@ -1,7 +1,7 @@
 <?php
 
 
-use PHPMailer\PHPMailer\PHPMailer;
+/*use PHPMailer\PHPMailer\PHPMailer;
 
 $mail = new PHPMailer(true);
 
@@ -30,4 +30,4 @@ try {
     echo 'Email has been sent!';
 } catch (Exception $e) {
     echo "Email could not be sent. Error: {$mail->ErrorInfo}";
-}
+}*/

@@ -8,11 +8,10 @@ use Random\RandomException;
 class CsrfToken
 {
     protected string $tokenName = '_csrf_token';
-    protected int $tokenExpirySeconds = 60 * 60; // 1 hour
 
 
     // Generate or get existing token
-    public function generateCSRF(): string
+    public function generateCSRF(int $tokenExpirySeconds = 60 * 60): string
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -22,7 +21,7 @@ class CsrfToken
             try {
                 $_SESSION[$this->tokenName] = [
                     'value' => bin2hex(random_bytes(32)),
-                    'expires' => time() + $this->tokenExpirySeconds,
+                    'expires' => time() + $tokenExpirySeconds,
                 ];
             } catch (RandomException $e) {
                 error_log('CSRF token generation failed: ' . $e->getMessage());
@@ -79,4 +78,21 @@ class CsrfToken
     {
         return $this->generateCSRF();
     }
+
+    public function getTokenScriptTag(): string
+    {
+        $tokenName = htmlspecialchars($this->tokenName, ENT_QUOTES, 'UTF-8');
+        $tokenValue = htmlspecialchars($this->generateCSRF(), ENT_QUOTES, 'UTF-8');
+
+        return <<<HTML
+        <script>
+            const csrf = {
+                name: "{$tokenName}",
+                value: "{$tokenValue}"
+            };
+        </script>
+    HTML;
+    }
+
+
 }
