@@ -8,7 +8,7 @@
 <body>
     <h1>Signing</h1>
 
-    <form method="POST" action="/user/signing">
+    <form method="POST" action="/user/login">
         <label for="email">
             Enter your email
             <input type="email" name="email" required placeholder="Email"><br>
@@ -20,10 +20,11 @@
         <?php
         // CSRF
         $token = new csrf\CsrfToken();
-        echo $token->getInputHtml();
+        echo $token->getCsrfInputHtml();
         ?>
         <button type="submit">Sign in</button>
-        <a href="/user/signup">Create new account</a>
+        <a href="/user/login">Create new account</a>
     </form>
+
 </body>
 </html>

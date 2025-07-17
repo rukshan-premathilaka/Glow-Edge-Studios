@@ -10,13 +10,13 @@ class User extends CsrfToken
 {
     public function create():string
     {
-        $name = isset($_POST['name']) ? trim($_POST['name']) : '';
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-        $re_password = isset($_POST['re_password']) ? trim($_POST['re_password']) : '';
+        $name = $this->input('name');
+        $email = $this->input('email');
+        $password = $this->input('password');
+        $re_password = $this->input('re_password');
 
         // Form validation
-        if (!isset($_POST[$this->tokenName]) || !$this->validateCSRF($_POST[$this->tokenName])) {
+        if (!$this->checkCSRF()) {
             http_response_code(403);
             return 'Unauthorized!';
         }
@@ -34,7 +34,7 @@ class User extends CsrfToken
         }
         if ($password !== $re_password) {
             http_response_code(422);
-            return 'Re-entered password is does not match!';
+            return 'Re-entered password does not match!';
         }
 
         // Database validation
@@ -55,9 +55,8 @@ class User extends CsrfToken
         $existing = DBHandle::query("SELECT `user_id` FROM user WHERE email = :email", ['email' => $email]);
         if (!empty($existing)) {
             http_response_code(409); // Conflict
-            return 'Email already in use! Please Login or use another email.';
+            return 'Email already in use!';
         }
-
 
         // Create new user
         $result = DBHandle::query("INSERT INTO user (name, email, password) VALUES (:name, :email, :password)", [
@@ -76,13 +75,13 @@ class User extends CsrfToken
         return 'success';
     }
 
-    public function authorize(): string
+    public function login(): string
     {
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+        $email = $this->input('email');
+        $password = $this->input('password');
 
         // Form validation
-        if (!isset($_POST[$this->tokenName]) || !$this->validateCSRF($_POST[$this->tokenName])) {
+        if (!$this->checkCSRF()) {
             http_response_code(403);
             return 'Unauthorized!';
         }
@@ -116,4 +115,146 @@ class User extends CsrfToken
 
         return 'success';
     }
+
+    public function logout(): string
+    {
+        // Form validation
+        if (!$this->checkCSRF()) {
+            http_response_code(403);
+            return 'Unauthorized!';
+        }
+
+        // Check if user is logged in
+        if (!$this->isLoggedIn()) {
+            http_response_code(401);
+            return 'User not logged in!';
+        }
+
+        // Destroy  session
+        session_unset();
+        session_destroy();
+
+        return 'success';
+    }
+
+    public function delete(): string
+    {
+        $password = $this->input('password');
+
+        // Form validation
+        if (!$this->checkCSRF()) {
+            http_response_code(403);
+            return 'Unauthorized!';
+        }
+        if (!v::stringType()->notEmpty()->validate($password)) {
+            http_response_code(422);
+            return 'Password is required!';
+        }
+        if (!$this->isLoggedIn()) {
+            http_response_code(401);
+            return 'User not logged in!';
+        }
+
+        // Validate user
+        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
+
+        // Check password
+        $user = $user[0]; // fetch first record
+        if (!password_verify($password, $user['password'])) {
+            http_response_code(401);
+            return 'Invalid password!';
+        }
+
+        // Delete user
+        $result = DBHandle::query("DELETE FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
+        if (!$result) {
+            http_response_code(500);
+            return 'Database error!';
+        }
+
+        // Destroy  session
+        session_unset();
+        session_destroy();
+
+        return 'success';
+    }
+
+    public function setPassword(): string
+    {
+        $password = $this->input('password');
+        $new_password = $this->input('new_password');
+        $re_new_password = $this->input('re_new_password');
+
+        // Form validation
+        if (!$this->checkCSRF()) {
+            http_response_code(403);
+            return 'Unauthorized!';
+        }
+        if (!v::stringType()->notEmpty()->validate($password)) {
+            http_response_code(422);
+            return 'Password is required!';
+        }
+        if (!v::stringType()->notEmpty()->validate($new_password)) {
+            http_response_code(422);
+            return 'New password is required!';
+        }
+        if (!v::stringType()->notEmpty()->validate($re_new_password)) {
+            http_response_code(422);
+            return 'Re-entered password is required!';
+        }
+        // Database validation
+        if (!v::stringType()->length(1, 20)->validate($new_password)) {
+            http_response_code(422);
+            return 'Password is too long! (20 characters max)';
+        }
+        if ($new_password !== $re_new_password) {
+            http_response_code(422);
+            return 'Re-entered password does not match!';
+        }
+        // Check if user is logged in
+        if (!$this->isLoggedIn()) {
+            http_response_code(401);
+            return 'User not logged in!';
+        }
+        // Validate user
+        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
+
+        // Check password
+        $user = $user[0]; // fetch first record
+        if (!password_verify($password, $user['password'])) {
+            http_response_code(401);
+            return 'Invalid current password!';
+        }
+
+        // Update password
+        $result = DBHandle::query("UPDATE user SET password = :password WHERE user_id = :user_id", ['password' => password_hash($new_password, PASSWORD_DEFAULT), 'user_id' => $_SESSION['user_id']]);
+        if (!$result) {
+            http_response_code(500);
+            return 'Database error!';
+        }
+
+        // Destroy  session
+        unset($_SESSION['user_id']);
+        $this->clearCSRF();
+
+        return 'success';
+    }
+
+    /* Helper Methods */
+    private function input(string $key): string {
+        return isset($_POST[$key]) ? trim($_POST[$key]) : '';
+    }
+    private function checkCSRF(): bool {
+        return isset($_POST[$this->tokenName]) && $this->validateCSRF($_POST[$this->tokenName]);
+    }
+
+    private function isLoggedIn(): bool
+    {
+        if (!isset($_SESSION['user_id'])) {
+            return false;
+        }
+        return true;
+    }
+
+
 }

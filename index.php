@@ -31,9 +31,14 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
     $r->get('/signing', function () {
         require 'views/user/signing.php';
     });
-
+    $r->get('/change_password', function () {
+        require 'views/user/change_password.php';
+    });
     $r->post('/signup',  [User::class, 'create']);
-    $r->Post('/signing',  [User::class, 'authorize']);
+    $r->Post('/login',  [User::class, 'login']);
+    $r->post('/logout', [User::class, 'logout']);
+    $r->post('/delete', [User::class, 'delete']);
+    $r->post('/change_password',  [User::class, 'setPassword']);
 });
 
 

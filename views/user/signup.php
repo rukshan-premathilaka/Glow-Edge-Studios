@@ -30,7 +30,7 @@
             // CSRF
             require "vendor/autoload.php";
             $token = new csrf\CsrfToken();
-            echo $token->getInputHtml();
+            echo $token->getCsrfInputHtml();
         ?>
         <button type="submit">Register</button>
         <a href="/user/signing">Already have an account</a>
