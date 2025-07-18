@@ -3,10 +3,9 @@
 namespace controller;
 
 use core\DBHandle;
-use csrf\CsrfToken;
 use Respect\Validation\Validator as v;
 
-class User extends CsrfToken
+class User
 {
     public function create():string
     {
@@ -16,10 +15,6 @@ class User extends CsrfToken
         $re_password = $this->input('re_password');
 
         // Form validation
-        if (!$this->checkCSRF()) {
-            http_response_code(403);
-            return 'Unauthorized!';
-        }
         if (!v::stringType()->notEmpty()->validate($name)) {
             http_response_code(422);
             return 'Name is required!';
@@ -70,8 +65,6 @@ class User extends CsrfToken
             return 'Database error!';
         }
 
-        $this->clearCSRF();
-
         return 'success';
     }
 
@@ -81,10 +74,6 @@ class User extends CsrfToken
         $password = $this->input('password');
 
         // Form validation
-        if (!$this->checkCSRF()) {
-            http_response_code(403);
-            return 'Unauthorized!';
-        }
         if (!v::email()->validate($email)) {
             http_response_code(422);
             return 'Email is required!';
@@ -109,8 +98,11 @@ class User extends CsrfToken
         }
 
         // Set session
-        $_SESSION['user_id'] = $user['user_id'];
-        $this->clearCSRF();
+        $_SESSION['user'] = [
+            'user_id' => $user['user_id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+        ];
 
 
         return 'success';
@@ -118,18 +110,6 @@ class User extends CsrfToken
 
     public function logout(): string
     {
-        // Form validation
-        if (!$this->checkCSRF()) {
-            http_response_code(403);
-            return 'Unauthorized!';
-        }
-
-        // Check if user is logged in
-        if (!$this->isLoggedIn()) {
-            http_response_code(401);
-            return 'User not logged in!';
-        }
-
         // Destroy  session
         session_unset();
         session_destroy();
@@ -142,17 +122,9 @@ class User extends CsrfToken
         $password = $this->input('password');
 
         // Form validation
-        if (!$this->checkCSRF()) {
-            http_response_code(403);
-            return 'Unauthorized!';
-        }
         if (!v::stringType()->notEmpty()->validate($password)) {
             http_response_code(422);
             return 'Password is required!';
-        }
-        if (!$this->isLoggedIn()) {
-            http_response_code(401);
-            return 'User not logged in!';
         }
 
         // Validate user
@@ -186,10 +158,6 @@ class User extends CsrfToken
         $re_new_password = $this->input('re_new_password');
 
         // Form validation
-        if (!$this->checkCSRF()) {
-            http_response_code(403);
-            return 'Unauthorized!';
-        }
         if (!v::stringType()->notEmpty()->validate($password)) {
             http_response_code(422);
             return 'Password is required!';
@@ -211,11 +179,6 @@ class User extends CsrfToken
             http_response_code(422);
             return 'Re-entered password does not match!';
         }
-        // Check if user is logged in
-        if (!$this->isLoggedIn()) {
-            http_response_code(401);
-            return 'User not logged in!';
-        }
         // Validate user
         $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
 
@@ -235,7 +198,6 @@ class User extends CsrfToken
 
         // Destroy  session
         unset($_SESSION['user_id']);
-        $this->clearCSRF();
 
         return 'success';
     }
@@ -243,17 +205,6 @@ class User extends CsrfToken
     /* Helper Methods */
     private function input(string $key): string {
         return isset($_POST[$key]) ? trim($_POST[$key]) : '';
-    }
-    private function checkCSRF(): bool {
-        return isset($_POST[$this->tokenName]) && $this->validateCSRF($_POST[$this->tokenName]);
-    }
-
-    private function isLoggedIn(): bool
-    {
-        if (!isset($_SESSION['user_id'])) {
-            return false;
-        }
-        return true;
     }
 
 

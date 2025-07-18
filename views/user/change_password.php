@@ -24,8 +24,8 @@
         </label>
         <?php
             // CSRF
-            $token = new csrf\CsrfToken();
-            echo $token->getCsrfInputHtml();
+            $token = new middleware\CsrfToken();
+            echo $token->getInputHtml();
         ?>
         <button type="submit">Change password</button>
 

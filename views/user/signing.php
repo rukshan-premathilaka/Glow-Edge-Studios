@@ -19,11 +19,11 @@
         </label>
         <?php
         // CSRF
-        $token = new csrf\CsrfToken();
-        echo $token->getCsrfInputHtml();
+        $token = new middleware\CsrfToken();
+        echo $token->getInputHtml();
         ?>
         <button type="submit">Sign in</button>
-        <a href="/user/login">Create new account</a>
+        <a href="/user/signup">Create new account</a>
     </form>
 
 </body>

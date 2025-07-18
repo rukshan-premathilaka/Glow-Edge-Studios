@@ -2,18 +2,18 @@
 
 require 'vendor/autoload.php';
 
-use Phroute\Phroute\RouteCollector;
 use Phroute\Phroute\Dispatcher;
+use Phroute\Phroute\RouteCollector;
 use controller\User;
-
-
-// Session start
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+use middleware\CsrfToken;
+use middleware\Auth;
 
 
 $router = new RouteCollector();
+
+/* --- MIDDLEWARE --- */
+$router->filter('auth', [Auth::class, 'handle']);
+$router->filter('csrf', [CsrfToken::class, 'validate']);
 
 /* --- TEST --- */
 $router->get('/home', function () {
@@ -28,8 +28,8 @@ $router->get('/ct', function () {
 
 /* --- EMAIL VERIFICATION TEST --- */
 $router->get('/mail', function () {
-    $token = new csrf\CsrfToken();
-    $mail = new service\Mail('Rukshan', 'ruka6486@gmail.com', 1, $token->generateCSRF(60));
+    $token = new middleware\CsrfToken();
+    $mail = new service\Mail('Rukshan', 'ruka6486@gmail.com', 1, $token->generate(60));
     $mail->sendMail();
 });
 $router->get('/user/verify', function () {
@@ -49,7 +49,7 @@ $router->get('/user/verify', function () {
 
 /* --- CSRF TOKEN --- */
 $router->get('/csrf', function () {
-    return (new csrf\CsrfToken())->getTokenScriptTag();
+    return (new middleware\CsrfToken())->getScriptTag();
 });
 
 /* --- USER ROUTE GROUP --- */
@@ -57,21 +57,22 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
     $r->get('/signup', function () {
         require 'views/user/signup.php';
     });
-    $r->get('/signing', function () {
+    $r->get('/login', function () {
         require 'views/user/signing.php';
     });
-    $r->get('/change_password', function () {
-        require 'views/user/change_password.php';
+    $r->group(['before' => 'csrf'], function (RouteCollector $r) {
+        $r->post('/signup',  [User::class, 'create']);
+        $r->Post('/login',  [User::class, 'login']);
+        $r->group(['before' => 'auth'], function (RouteCollector $r) {
+            $r->get('/change_password', function () {
+                require 'views/user/change_password.php';
+            });
+            $r->post('/logout', [User::class, 'logout']);
+            $r->post('/delete', [User::class, 'delete']);
+            $r->post('/change_password',  [User::class, 'setPassword']);
+        });
     });
-    $r->post('/signup',  [User::class, 'create']);
-    $r->Post('/login',  [User::class, 'login']);
-    $r->post('/logout', [User::class, 'logout']);
-    $r->post('/delete', [User::class, 'delete']);
-    $r->post('/change_password',  [User::class, 'setPassword']);
 });
-
-
-
 
 
 

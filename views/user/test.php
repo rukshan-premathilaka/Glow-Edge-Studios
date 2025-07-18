@@ -8,8 +8,8 @@
     <script src="/public/js/main.js"></script>
     <?php
         // CSRF
-        $token = new csrf\CsrfToken();
-        echo $token->getTokenScriptTag();
+        $token = new middleware\CsrfToken();
+        echo $token->getScriptTag();
     ?>
 </head>
 <body>

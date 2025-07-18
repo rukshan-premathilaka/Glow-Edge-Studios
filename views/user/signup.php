@@ -29,11 +29,11 @@
         <?php
             // CSRF
             require "vendor/autoload.php";
-            $token = new csrf\CsrfToken();
-            echo $token->getCsrfInputHtml();
+            $token = new middleware\CsrfToken();
+            echo $token->getInputHtml();
         ?>
         <button type="submit">Register</button>
-        <a href="/user/signing">Already have an account</a>
+        <a href="/user/login">Already have an account</a>
     </form>
 
 

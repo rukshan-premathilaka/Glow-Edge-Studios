@@ -7,7 +7,7 @@
         "psr-4": {
             "controller\\": "src/controller/",
             "core\\": "src/core/",
-            "csrf\\": "src/csrf/",
+            "middleware\\": "src/middleware/",
             "service\\": "src/service/"
         }
     },
