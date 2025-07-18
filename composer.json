@@ -8,7 +8,7 @@
             "controller\\": "src/controller/",
             "core\\": "src/core/",
             "csrf\\": "src/csrf/",
-            "service\\": "src/service"
+            "service\\": "src/service/"
         }
     },
     "authors": [

@@ -32,7 +32,6 @@ $router->get('/mail', function () {
     $mail = new service\Mail('Rukshan', 'ruka6486@gmail.com', 1, $token->generateCSRF(60));
     $mail->sendMail();
 });
-
 $router->get('/user/verify', function () {
     $key = $_GET['key'] ?? '';
     $id = $_GET['id'] ?? '';
@@ -47,7 +46,6 @@ $router->get('/user/verify', function () {
     http_response_code(400);
     return "Invalid verification link!";
 });
-
 
 /* --- CSRF TOKEN --- */
 $router->get('/csrf', function () {
