@@ -8,16 +8,13 @@ use PHPMailer\PHPMailer\Exception;
 class Mail
 {
 
-    private string $username = 'rxx25384@gmail.com';
-    private string $password = 'zhym okpz akhn lyiv';
-    private string $sender = 'rxx25384@gmail.com';
+    private string $username;
+    private string $password;
+    private string $sender;
     private string $receiver;
     private string $receiverAddress;
-
     private int $userId;
-
     private string $token;
-
     private string $subject = 'Hello from PHPMailer';
     private string $body = 'This is a <b>test email</b> sent using PHPMailer';
 
@@ -26,6 +23,9 @@ class Mail
     // constructor
     public function __construct(string $receiver, string $address, int $userId, string $token)
     {
+        $this->username = $_ENV['MAIL_USERNAME'];
+        $this->password = $_ENV['MAIL_PASSWORD'];
+        $this->sender = $_ENV['MAIL_SENDER'];
         $this->receiver = $receiver;
         $this->receiverAddress = $address;
         $this->userId = $userId;
@@ -72,7 +72,7 @@ class Mail
             <h2 style="color: #333;">Please verify your email address</h2>
             <p style="color: #555;">Click the button below to verify your email address:</p>
 
-            <a href="http://localhost:8000/user/verify?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
+            <a href="http://' . $_SERVER['HTTP_HOST'] . '/user/verify?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
                style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                 Verify Email
             </a>

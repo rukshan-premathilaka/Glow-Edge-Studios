@@ -7,12 +7,26 @@ use Phroute\Phroute\RouteCollector;
 use controller\User;
 use middleware\CsrfToken;
 use middleware\Auth;
+use Dotenv\Dotenv;
+
+/* --- LOAD ENV --- */
+try {
+    $dotenv = Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
 
 
 $router = new RouteCollector();
 
+
+
+
+
 /* --- MIDDLEWARE --- */
 $router->filter('auth', [Auth::class, 'handle']);
+$router->filter('authAdmin', [Auth::class, 'isAdmin']);
 $router->filter('csrf', [CsrfToken::class, 'validate']);
 
 /* --- TEST --- */
@@ -74,6 +88,15 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
     });
 });
 
+/* --- ADMIN ROUTE GROUP --- */
+$router->group(['prefix' => 'admin', 'before' => 'authAdmin'], function (RouteCollector $r) {
+    $r->get('/dashboard', function () {
+        require 'views/admin/dashboard.php';
+    });
+});
+
+
+
 
 
 // Dispatcher
@@ -85,7 +108,6 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 try {
     // Try to dispatch the request
     echo $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
-
 } catch (Exception $e) {
     // 404 Not Found
     http_response_code(404);

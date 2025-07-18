@@ -4,6 +4,7 @@ namespace core;
 
 use PDO;
 use PDOException;
+use Dotenv\Dotenv;
 
 class DBHandle
 {
@@ -14,11 +15,11 @@ class DBHandle
     public static function connect(): PDO
     {
         if (self::$pdo === null) {
-            $host = 'localhost';
-            $dbname = 'glow_edge_studios';
-            $username = 'root';
-            $password = 'Rasintha2002@';
-            $charset = 'utf8mb4';
+            $host = $_ENV['DB_HOST'];
+            $dbname = $_ENV['DB_NAME'];
+            $username = $_ENV['DB_USER'];
+            $password = $_ENV['DB_PASS'];
+            $charset = $_ENV['DB_CHARSET'];
 
             $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
 

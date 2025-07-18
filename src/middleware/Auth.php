@@ -15,4 +15,14 @@ class Auth
             exit;
         }
     }
+
+    public function isAdmin(): void
+    {
+        $this->handle();
+
+        if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
+            header('Location: /404');
+            exit;
+        }
+    }
 }

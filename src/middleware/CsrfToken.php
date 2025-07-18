@@ -11,7 +11,7 @@ class CsrfToken
 
 
     // Generate or get existing token
-    public function generate(int $tokenExpirySeconds = 60): string
+    public function generate(int $tokenExpirySeconds = 60 * 60): string
     {
         $this->ensureSession();
 
