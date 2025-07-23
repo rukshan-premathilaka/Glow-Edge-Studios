@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/public/css/main.css">
     <title>Signing</title>
 </head>
 <body>
@@ -24,6 +25,7 @@
         ?>
         <button type="submit">Sign in</button>
         <a href="/user/signup">Create new account</a>
+        <a href="/forgot_password">Forgot password</a>
     </form>
 
 </body>

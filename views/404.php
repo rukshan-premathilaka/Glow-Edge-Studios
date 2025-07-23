@@ -10,8 +10,16 @@
 
     <div class="screen-size">
         <div class="center-around">
-            <h2>404 Error</h2>
-            <h1>Page Not Found!</h1>
+            <h2 style="text-align: center">404 Error</h2>
+            <h1 style="text-align: center">Page Not Found!</h1>
+            <?php
+            session_start();
+            $error = $_SESSION['error'] ?? '';
+            unset($_SESSION['error']); // clear flash message after use
+            ?>
+
+            <p style="color: red; text-align: center; font-weight: bold; font-size: 20px"><?= htmlspecialchars($error) ?></p>
+
         </div>
     </div>
 

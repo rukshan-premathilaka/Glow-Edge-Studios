@@ -3,16 +3,25 @@
 namespace controller;
 
 use core\DBHandle;
+use middleware\CsrfToken;
 use Respect\Validation\Validator as v;
+use service\Mail;
 
-class User
+class User extends Helper
 {
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
     public function create():string
     {
-        $name = $this->input('name');
-        $email = $this->input('email');
-        $password = $this->input('password');
-        $re_password = $this->input('re_password');
+        $name = $this->PostInput('name');
+        $email = $this->PostInput('email');
+        $password = $this->PostInput('password');
+        $re_password = $this->PostInput('re_password');
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($name)) {
@@ -59,19 +68,47 @@ class User
             'email' => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT),
         ]);
-
         if (!$result) {
             http_response_code(500);
             return 'Database error!';
         }
+
+        // Get user id
+        $user_id = (DBHandle::query("SELECT `user_id` FROM user WHERE email = :email", ['email' => $email]));
+        if (!$user_id) {
+            http_response_code(500);
+            return 'Database error!';
+        }
+        $user_id = $user_id[0]['user_id'];
+
+        // Get role id
+        $role_id = (DBHandle::query("SELECT `role_id` FROM role WHERE role = :role", ['role' => 'user']));
+        if (!$role_id) {
+            http_response_code(500);
+            return 'Database error!';
+        }
+        $role_id = $role_id[0]['role_id'];
+
+        // Create user role
+        $result = DBHandle::query("INSERT INTO user_has_role (user_user_id, role_role_id) VALUES (:user_id, :role_id)",
+            [
+                'user_id' => $user_id,
+                'role_id' => $role_id
+            ]);
+        if (!$result) {
+            http_response_code(500);
+            return 'Database error!';
+        }
+
+        CsrfToken::clearCSRFToken();
 
         return 'success';
     }
 
     public function login(): string
     {
-        $email = $this->input('email');
-        $password = $this->input('password');
+        $email = $this->PostInput('email');
+        $password = $this->PostInput('password');
 
         // Form validation
         if (!v::email()->validate($email)) {
@@ -104,6 +141,26 @@ class User
             'email' => $user['email'],
         ];
 
+        // Set user role
+        $sql = "SELECT
+                    r.role
+                FROM
+                    user_has_role uhr
+                    INNER JOIN role r ON uhr.role_role_id = r.role_id
+                    INNER JOIN user u ON uhr.user_user_id = u.user_id
+                WHERE u.user_id = :userId;";
+
+        $result = DBHandle::query($sql, [
+            'userId' => $user['user_id']
+        ]);
+
+        // Set user roles
+        foreach ($result as $role) {
+            $_SESSION['user']['role'][] = $role['role'];
+        }
+
+
+        CsrfToken::clearCSRFToken();
 
         return 'success';
     }
@@ -119,7 +176,7 @@ class User
 
     public function delete(): string
     {
-        $password = $this->input('password');
+        $password = $this->PostInput('password');
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($password)) {
@@ -128,7 +185,7 @@ class User
         }
 
         // Validate user
-        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
+        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user']['user_id']]);
 
         // Check password
         $user = $user[0]; // fetch first record
@@ -138,7 +195,7 @@ class User
         }
 
         // Delete user
-        $result = DBHandle::query("DELETE FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
+        $result = DBHandle::query("DELETE FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user']['user_id']]);
         if (!$result) {
             http_response_code(500);
             return 'Database error!';
@@ -153,9 +210,9 @@ class User
 
     public function setPassword(): string
     {
-        $password = $this->input('password');
-        $new_password = $this->input('new_password');
-        $re_new_password = $this->input('re_new_password');
+        $password = $this->PostInput('password');
+        $new_password = $this->PostInput('new_password');
+        $re_new_password = $this->PostInput('re_new_password');
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($password)) {
@@ -180,7 +237,7 @@ class User
             return 'Re-entered password does not match!';
         }
         // Validate user
-        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user_id']]);
+        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user']['user_id']]);
 
         // Check password
         $user = $user[0]; // fetch first record
@@ -190,22 +247,65 @@ class User
         }
 
         // Update password
-        $result = DBHandle::query("UPDATE user SET password = :password WHERE user_id = :user_id", ['password' => password_hash($new_password, PASSWORD_DEFAULT), 'user_id' => $_SESSION['user_id']]);
+        $result = DBHandle::query("UPDATE user SET password = :password WHERE user_id = :user_id", ['password' => password_hash($new_password, PASSWORD_DEFAULT), 'user_id' => $_SESSION['user']['user_id']]);
         if (!$result) {
             http_response_code(500);
             return 'Database error!';
         }
 
         // Destroy  session
-        unset($_SESSION['user_id']);
+        unset($_SESSION['user']);
+
+        CsrfToken::clearCSRFToken();
+        return 'success';
+    }
+
+    public function forgotPassword(): string
+    {
+        $email = $this->PostInput('email');
+
+        // Form validation
+        if (!v::email()->validate($email)) {
+            http_response_code(422);
+            return 'Email is required!';
+        }
+
+        // Validate user
+        $user = DBHandle::query("SELECT * FROM user WHERE email = :email", ['email' => $email]);
+
+        // Check email exists
+        $user = $user[0];
+        if (!$user) {
+            http_response_code(401);
+            return 'Email not found!';
+        }
+
+        // Send email
+        CsrfToken::clearCSRFToken();
+        $mail = new Mail($user['name'], $user['email'], $user['user_id'], (new CsrfToken())->generate(60 * 3));
+        $mail->setContentResetPassword();
+        $mail->sendMail();
+
+
 
         return 'success';
     }
 
-    /* Helper Methods */
-    private function input(string $key): string {
-        return isset($_POST[$key]) ? trim($_POST[$key]) : '';
+    public function getNewPasswordPage() : void
+    {
+        $token = $this->PostInput('key');
+        $id = $this->getInput('id');
+        $email = $this->PostInput('email');
+
+        // validate token
+        $csrf = new CsrfToken();
+        $csrf->validate($token);
+        $csrf->clear();
+
+        // Give set new password page
+        require 'views/user/create_new_password.php';
     }
+
 
 
 }

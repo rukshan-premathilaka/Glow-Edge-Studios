@@ -5,16 +5,18 @@ require 'vendor/autoload.php';
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\RouteCollector;
 use controller\User;
+use controller\Admin;
 use middleware\CsrfToken;
 use middleware\Auth;
 use Dotenv\Dotenv;
+
 
 /* --- LOAD ENV --- */
 try {
     $dotenv = Dotenv::createImmutable(__DIR__);
     $dotenv->load();
 } catch (Exception $e) {
-    echo $e->getMessage();
+    die('Error loading .env file: ' . $e->getMessage());
 }
 
 
@@ -30,17 +32,17 @@ $router->filter('authAdmin', [Auth::class, 'isAdmin']);
 $router->filter('csrf', [CsrfToken::class, 'validate']);
 
 /* --- TEST --- */
-$router->get('/home', function () {
-    require 'views/home.php';
-});
 $router->get('/t', function () {
+    require 'test/test.php';
+});
+$router->POST('/t', function () {
     require 'test/test.php';
 });
 $router->get('/ct', function () {
     require 'views/user/test.php';
 });
 
-/* --- EMAIL VERIFICATION TEST --- */
+/* --- REQUEST FROM EMAIL --- */
 $router->get('/mail', function () {
     $token = new middleware\CsrfToken();
     $mail = new service\Mail('Rukshan', 'ruka6486@gmail.com', 1, $token->generate(60));
@@ -61,9 +63,28 @@ $router->get('/user/verify', function () {
     return "Invalid verification link!";
 });
 
+
 /* --- CSRF TOKEN --- */
 $router->get('/csrf', function () {
     return (new middleware\CsrfToken())->getScriptTag();
+});
+
+/* --- PAGE --- */
+$router->get('/', function () {
+    require 'views/home.php';
+});
+$router->get('/home', function () {
+    require 'views/home.php';
+});
+
+
+/*  --- FORGOT PASSWORD --- */
+$router->get('/forgot_password', function () {
+    require 'views/user/forgot_password.php';
+});
+$router->get('/new_password',  [User::class, 'getNewPasswordPage']);
+$router->group(['before' => 'csrf'], function (RouteCollector $r) {
+    $r->post('/forgot_password',  [User::class, 'forgotPassword']);  // send email
 });
 
 /* --- USER ROUTE GROUP --- */
@@ -72,17 +93,17 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
         require 'views/user/signup.php';
     });
     $r->get('/login', function () {
-        require 'views/user/signing.php';
+        require 'views/user/login.php';
     });
     $r->group(['before' => 'csrf'], function (RouteCollector $r) {
         $r->post('/signup',  [User::class, 'create']);
         $r->Post('/login',  [User::class, 'login']);
         $r->group(['before' => 'auth'], function (RouteCollector $r) {
+            $r->post('/logout', [User::class, 'logout']);
+            $r->post('/delete', [User::class, 'delete']);
             $r->get('/change_password', function () {
                 require 'views/user/change_password.php';
             });
-            $r->post('/logout', [User::class, 'logout']);
-            $r->post('/delete', [User::class, 'delete']);
             $r->post('/change_password',  [User::class, 'setPassword']);
         });
     });
@@ -93,6 +114,15 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], function (RouteCo
     $r->get('/dashboard', function () {
         require 'views/admin/dashboard.php';
     });
+    $r->get('/', function () {
+        require 'views/admin/dashboard.php';
+    });
+
+    /* --- PORTFOLIO --- */
+    $r->group(['prefix' => 'portfolio'], function (RouteCollector $r) {
+        $r->post('/add', [Admin::class, 'addPortfolioItem']);
+    });
+
 });
 
 
@@ -104,6 +134,8 @@ $dispatcher = new Dispatcher($router->getData());
 
 // Current URI
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// print uri
 
 try {
     // Try to dispatch the request

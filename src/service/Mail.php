@@ -30,7 +30,6 @@ class Mail
         $this->receiverAddress = $address;
         $this->userId = $userId;
         $this->token = $token;
-        $this->setContent();
     }
 
     public function sendMail(): void
@@ -63,26 +62,48 @@ class Mail
         }
     }
 
-    public function setContent(): void
+    public function setContentEmailVerification(): void
     {
         $body = '
-    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-        <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; text-align: center;">
-            <h1>Hello, ' . htmlspecialchars($this->receiver) . '!</h1>
-            <h2 style="color: #333;">Please verify your email address</h2>
-            <p style="color: #555;">Click the button below to verify your email address:</p>
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; text-align: center;">
+                            <h1>Hello, ' . htmlspecialchars($this->receiver) . '!</h1>
+                            <h2 style="color: #333;">Please verify your email address</h2>
+                            <p style="color: #555;">Click the button below to verify your email address:</p>
+                
+                            <a href="http://' . $_SERVER['HTTP_HOST'] . '/user/verify?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
+                               style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                Verify Email
+                            </a>
+                
+                            <p style="margin-top: 30px; color: #999;">Thanks,<br>Team Glow Edge Studios</p>
+                        </div>
+                    </div>
+        ';
 
-            <a href="http://' . $_SERVER['HTTP_HOST'] . '/user/verify?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
-               style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                Verify Email
-            </a>
-
-            <p style="margin-top: 30px; color: #999;">Thanks,<br>Team Glow Edge Studios</p>
-        </div>
-    </div>
-';
         $this->body = $body;
-
     }
+
+    public function setContentResetPassword(): void
+    {
+        $body = '
+                    <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; text-align: center;">
+                            <h1>Hello, ' . htmlspecialchars($this->receiver) . '!</h1>
+                            <h2 style="color: #333;">Please reset your password</h2>
+                            <p style="color: #555;">Click the button below to reset your password:</p>
+                            <a href="http://' . $_SERVER['HTTP_HOST'] . '/new_password?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
+                               style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                Verify Email
+                            </a>
+                            <p style="margin-top: 30px; color: #999;">Thanks,<br>Team Glow Edge Studios</p>
+                        </div>
+                    </div>
+                 ';
+
+        $this->body = $body;
+    }
+
+
 
 }

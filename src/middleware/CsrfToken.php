@@ -7,14 +7,20 @@ use Random\RandomException;
 
 class CsrfToken
 {
+
+    private bool $tokenCheck = true;
     protected string $tokenName = '_csrf_token';
 
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
 
     // Generate or get existing token
     public function generate(int $tokenExpirySeconds = 60 * 60): string
     {
-        $this->ensureSession();
-
         if (empty($_SESSION[$this->tokenName]['value']) || $this->isExpired()) {
             try {
                 $_SESSION[$this->tokenName] = [
@@ -31,24 +37,36 @@ class CsrfToken
 
 
     // Validate incoming token
-    public function validate(): void
+    public function validate(?string $token): void
     {
-        $this->ensureSession();
+        if (!$this->tokenCheck) {
+            return;
+        }
 
-        if (!is_string($_POST[$this->tokenName]) || !isset($_SESSION[$this->tokenName]['value'])) {
+        $sessionToken = $_SESSION[$this->tokenName]['value'] ?? null;
+
+        // Use token from $_POST if $token is null
+        if (is_null($token)) {
+            $token = isset($_POST[$this->tokenName]) ? (string)$_POST[$this->tokenName] : null;
+        }
+
+        // Check if token and session token are valid strings
+        if (!is_string($token) || !is_string($sessionToken)) {
             $this->clear();
             http_response_code(401);
             echo "Unauthorized request";
             exit;
         }
 
-        if ($_POST[$this->tokenName] !== $_SESSION[$this->tokenName]['value']) {
+        // Compare tokens
+        if ($token !== $sessionToken) {
             $this->clear();
             http_response_code(401);
             echo "Unauthorized request: invalid token";
             exit;
         }
 
+        // Check expiration
         if ($this->isExpired()) {
             $this->clear();
             http_response_code(401);
@@ -56,16 +74,22 @@ class CsrfToken
             exit;
         }
 
-        $this->clear();
+        // $this->clear(); // clear after use
     }
+
+
 
 
     // Clear token
     public function clear(): void
     {
-        $this->ensureSession();
-
         unset($_SESSION[$this->tokenName]);
+    }
+
+    public static function clearCSRFToken(): void
+    {
+        $token = new self();
+        $token->clear();
     }
 
     protected function isExpired(): bool
@@ -100,6 +124,11 @@ class CsrfToken
     HTML;
     }
 
+    public function getTokenName(): string
+    {
+        return $this->tokenName;
+    }
+
     // Session start
     protected function ensureSession(): void
     {
@@ -107,6 +136,5 @@ class CsrfToken
             session_start();
         }
     }
-
 
 }
