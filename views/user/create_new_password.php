@@ -1,3 +1,9 @@
+<?php
+    // CSRF
+    $token = new middleware\CsrfToken();
+
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,7 +16,7 @@
 
 <h1>Create New password</h1>
 
-<form method="POST" action="/user/change_password">
+<form method="POST" action="/new_password">
 
     <label for="new_password">
         Enter your new password
@@ -20,11 +26,11 @@
         Enter again new your password
         <input type="password" name="re_new_password" required placeholder="New password again"><br>
     </label>
-    <?php
-    // CSRF
-    $token = new middleware\CsrfToken();
-    echo $token->getInputHtml();
-    ?>
+
+    <?php echo $token->getInputHtml(); ?>
+    <input type="hidden" name="id" value="<?php echo $_SESSION['forgot']['user_id']; ?>">
+    <input type="hidden" name="email" value="<?php echo $_SESSION['forgot']['email']; ?>">
+
     <button type="submit">Change password</button>
 
 </body>

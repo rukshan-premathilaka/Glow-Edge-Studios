@@ -9,6 +9,7 @@ use service\Mail;
 
 class User extends Helper
 {
+    // Constructor
     public function __construct()
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -16,6 +17,7 @@ class User extends Helper
         }
     }
 
+    // Create new user
     public function create():string
     {
         $name = $this->PostInput('name');
@@ -105,6 +107,7 @@ class User extends Helper
         return 'success';
     }
 
+    // Login
     public function login(): string
     {
         $email = $this->PostInput('email');
@@ -165,6 +168,7 @@ class User extends Helper
         return 'success';
     }
 
+    // Logout
     public function logout(): string
     {
         // Destroy  session
@@ -174,6 +178,7 @@ class User extends Helper
         return 'success';
     }
 
+    // Delete user a
     public function delete(): string
     {
         $password = $this->PostInput('password');
@@ -208,6 +213,7 @@ class User extends Helper
         return 'success';
     }
 
+    // change password
     public function setPassword(): string
     {
         $password = $this->PostInput('password');
@@ -260,6 +266,7 @@ class User extends Helper
         return 'success';
     }
 
+    // give forgot password page
     public function forgotPassword(): string
     {
         $email = $this->PostInput('email');
@@ -274,38 +281,97 @@ class User extends Helper
         $user = DBHandle::query("SELECT * FROM user WHERE email = :email", ['email' => $email]);
 
         // Check email exists
-        $user = $user[0];
+
         if (!$user) {
             http_response_code(401);
             return 'Email not found!';
         }
+        $user = $user[0];
 
         // Send email
         CsrfToken::clearCSRFToken();
-        $mail = new Mail($user['name'], $user['email'], $user['user_id'], (new CsrfToken())->generate(60 * 3));
+        $mail = new Mail($user['name'], $user['email'], $user['user_id'], (new CsrfToken())->generate(60));
         $mail->setContentResetPassword();
         $mail->sendMail();
-
-
 
         return 'success';
     }
 
+    // give new password page
     public function getNewPasswordPage() : void
     {
-        $token = $this->PostInput('key');
+        $token = $this->getInput('key');
         $id = $this->getInput('id');
-        $email = $this->PostInput('email');
+        $email = $this->getInput('email');
 
         // validate token
         $csrf = new CsrfToken();
         $csrf->validate($token);
         $csrf->clear();
 
+        // add data to session
+        $_SESSION['forgot']['user_id'] = $id;
+        $_SESSION['forgot']['email'] = $email;
+
         // Give set new password page
         require 'views/user/create_new_password.php';
     }
 
+    // set new password
+    public function setNewPassword(): string
+    {
+        $id = $this->PostInput('id');
+        $email = $this->PostInput('email');
+        $new_password = $this->PostInput('new_password');
+        $re_new_password = $this->PostInput('re_new_password');
 
+        // Form validation
+        if (!v::stringType()->notEmpty()->validate($id)) {
+            http_response_code(422);
+            return 'ID is required!';
+        }
+        if (!v::notEmpty()->email()->validate($email)) {
+            http_response_code(422);
+            return 'Email is required!';
+        }
+        if (!v::stringType()->notEmpty()->validate($new_password)) {
+            http_response_code(422);
+            return 'New password is required!';
+        }
+        if (!v::stringType()->notEmpty()->validate($re_new_password)) {
+            http_response_code(422);
+            return 'Re-entered password is required!';
+        }
+        // Database validation
+        if (!v::stringType()->length(1, 20)->validate($new_password)) {
+            http_response_code(422);
+            return 'Password is too long! (20 characters max)';
+        }
+        if ($new_password !== $re_new_password) {
+            http_response_code(422);
+            return 'Re-entered password does not match!';
+        }
+        // Validate user
+        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id AND email = :email", ['user_id' => $id, 'email' => $email]);
+        // Check email exists
+        $user = $user[0];
+        if (!$user) {
+            http_response_code(401);
+            return 'User not found!';
+        }
+
+        // Update password
+        $result = DBHandle::query("UPDATE user SET password = :password WHERE user_id = :user_id", ['password' => password_hash($new_password, PASSWORD_DEFAULT), 'user_id' => $id]);
+        if (!$result) {
+            http_response_code(500);
+            return 'Database error!';
+        }
+
+        // Destroy  session
+        unset($_SESSION['user']);
+
+        CsrfToken::clearCSRFToken();
+        return 'success';
+    }
 
 }

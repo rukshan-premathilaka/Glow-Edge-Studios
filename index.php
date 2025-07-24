@@ -31,38 +31,6 @@ $router->filter('auth', [Auth::class, 'handle']);
 $router->filter('authAdmin', [Auth::class, 'isAdmin']);
 $router->filter('csrf', [CsrfToken::class, 'validate']);
 
-/* --- TEST --- */
-$router->get('/t', function () {
-    require 'test/test.php';
-});
-$router->POST('/t', function () {
-    require 'test/test.php';
-});
-$router->get('/ct', function () {
-    require 'views/user/test.php';
-});
-
-/* --- REQUEST FROM EMAIL --- */
-$router->get('/mail', function () {
-    $token = new middleware\CsrfToken();
-    $mail = new service\Mail('Rukshan', 'ruka6486@gmail.com', 1, $token->generate(60));
-    $mail->sendMail();
-});
-$router->get('/user/verify', function () {
-    $key = $_GET['key'] ?? '';
-    $id = $_GET['id'] ?? '';
-    $email = $_GET['email'] ?? '';
-
-    // You should validate token and ID here
-    if (!empty($key) && !empty($id) && !empty($email)) {
-        // Example: check token and mark email as verified in DB
-        return "Email verified for user ID $id with email $email and token $key";
-    }
-
-    http_response_code(400);
-    return "Invalid verification link!";
-});
-
 
 /* --- CSRF TOKEN --- */
 $router->get('/csrf', function () {
@@ -85,6 +53,7 @@ $router->get('/forgot_password', function () {
 $router->get('/new_password',  [User::class, 'getNewPasswordPage']);
 $router->group(['before' => 'csrf'], function (RouteCollector $r) {
     $r->post('/forgot_password',  [User::class, 'forgotPassword']);  // send email
+    $r->post('/new_password',  [User::class, 'setNewPassword']); // add new password
 });
 
 /* --- USER ROUTE GROUP --- */
@@ -114,10 +83,6 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], function (RouteCo
     $r->get('/dashboard', function () {
         require 'views/admin/dashboard.php';
     });
-    $r->get('/', function () {
-        require 'views/admin/dashboard.php';
-    });
-
     /* --- PORTFOLIO --- */
     $r->group(['prefix' => 'portfolio'], function (RouteCollector $r) {
         $r->post('/add', [Admin::class, 'addPortfolioItem']);

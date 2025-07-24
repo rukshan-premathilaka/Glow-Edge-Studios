@@ -94,7 +94,7 @@ class Mail
                             <p style="color: #555;">Click the button below to reset your password:</p>
                             <a href="http://' . $_SERVER['HTTP_HOST'] . '/new_password?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
                                style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                                Verify Email
+                                Reset Password
                             </a>
                             <p style="margin-top: 30px; color: #999;">Thanks,<br>Team Glow Edge Studios</p>
                         </div>
