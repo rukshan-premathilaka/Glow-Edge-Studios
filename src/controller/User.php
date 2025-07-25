@@ -27,41 +27,33 @@ class User extends Helper
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($name)) {
-            http_response_code(422);
-            return 'Name is required!';
+            return $this->jsonResponse("error", "Name is required!", 422);
         }
         if (!v::email()->validate($email)) {
-            http_response_code(422);
-            return 'Email is required!';
+            return $this->jsonResponse("error", "Email is required!", 422);
         }
         if (!v::stringType()->notEmpty()->validate($password)) {
-            http_response_code(422);
-            return 'Password is required!';
+            return $this->jsonResponse("error", "Password is required!", 422);
         }
         if ($password !== $re_password) {
-            http_response_code(422);
-            return 'Re-entered password does not match!';
+            return $this->jsonResponse("error", "Passwords do not match!", 422);
         }
 
         // Database validation
         if (!v::stringType()->length(1, 255)->validate($name)) {
-            http_response_code(422);
-            return 'Name is too long! (255 characters max)';
+            return $this->jsonResponse("error", "Name is too long! (255 characters max)", 422);
         }
         if (!v::stringType()->length(1, 255)->validate($email)) {
-            http_response_code(422);
-            return 'Email is too long! (255 characters max)';
+            return $this->jsonResponse("error", "Email is too long! (255 characters max)", 422);
         }
         if (!v::stringType()->length(1, 20)->validate($password)) {
-            http_response_code(422);
-            return 'Password is too long! (20 characters max)';
+            return $this->jsonResponse("error", "Password is too long! (20 characters max)", 422);
         }
 
         // Check if email already exists
         $existing = DBHandle::query("SELECT `user_id` FROM user WHERE email = :email", ['email' => $email]);
         if (!empty($existing)) {
-            http_response_code(409); // Conflict
-            return 'Email already in use!';
+            return $this->jsonResponse("error", "Email already exists!", 409);
         }
 
         // Create new user
@@ -71,15 +63,14 @@ class User extends Helper
             'password' => password_hash($password, PASSWORD_DEFAULT),
         ]);
         if (!$result) {
-            http_response_code(500);
-            return 'Database error!';
+            return $this->jsonResponse("error", "Database error!", 500);
         }
 
         // Get user id
         $user_id = (DBHandle::query("SELECT `user_id` FROM user WHERE email = :email", ['email' => $email]));
         if (!$user_id) {
-            http_response_code(500);
-            return 'Database error!';
+
+            return $this->jsonResponse("error", "Database error!", 500);
         }
         $user_id = $user_id[0]['user_id'];
 
@@ -87,7 +78,7 @@ class User extends Helper
         $role_id = (DBHandle::query("SELECT `role_id` FROM role WHERE role = :role", ['role' => 'user']));
         if (!$role_id) {
             http_response_code(500);
-            return 'Database error!';
+            return $this->jsonResponse("error", "Database error!", 500);
         }
         $role_id = $role_id[0]['role_id'];
 
@@ -99,12 +90,12 @@ class User extends Helper
             ]);
         if (!$result) {
             http_response_code(500);
-            return 'Database error!';
+            return $this->jsonResponse("error", "Database error!", 500);
         }
 
         CsrfToken::clearCSRFToken();
 
-        return 'success';
+        return $this->jsonResponse("success", "User created successfully!");
     }
 
     // Login
@@ -115,26 +106,22 @@ class User extends Helper
 
         // Form validation
         if (!v::email()->validate($email)) {
-            http_response_code(422);
-            return 'Email is required!';
+            return $this->jsonResponse("error", "Email is required!", 422);
         }
         if (!v::stringType()->notEmpty()->validate($password)) {
-            http_response_code(422);
-            return 'Password is required!';
+            return $this->jsonResponse("error", "Password is required!", 422);
         }
 
         // Validate user
         $user = DBHandle::query("SELECT * FROM user WHERE email = :email", ['email' => $email]);
         // Check if user exists
         if (empty($user)) {
-            http_response_code(401);
-            return 'Invalid email or password!';
+            return $this->jsonResponse("error", "Invalid email or password!", 401);
         }
         // Check password
         $user = $user[0]; // fetch first record
         if (!password_verify($password, $user['password'])) {
-            http_response_code(401);
-            return 'Invalid email or password!';
+            return $this->jsonResponse("error", "Invalid email or password!", 401);
         }
 
         // Set session
@@ -162,10 +149,9 @@ class User extends Helper
             $_SESSION['user']['role'][] = $role['role'];
         }
 
-
         CsrfToken::clearCSRFToken();
 
-        return 'success';
+        return $this->jsonResponse("success", "Login successful!");
     }
 
     // Logout
@@ -175,7 +161,7 @@ class User extends Helper
         session_unset();
         session_destroy();
 
-        return 'success';
+        return $this->jsonResponse("success", "Logout successful!");
     }
 
     // Delete user a
@@ -185,8 +171,7 @@ class User extends Helper
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($password)) {
-            http_response_code(422);
-            return 'Password is required!';
+            return $this->jsonResponse("error", "Password is required!", 422);
         }
 
         // Validate user
@@ -195,22 +180,20 @@ class User extends Helper
         // Check password
         $user = $user[0]; // fetch first record
         if (!password_verify($password, $user['password'])) {
-            http_response_code(401);
-            return 'Invalid password!';
+            return $this->jsonResponse("error", "Invalid password!", 401);
         }
 
         // Delete user
         $result = DBHandle::query("DELETE FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user']['user_id']]);
         if (!$result) {
-            http_response_code(500);
-            return 'Database error!';
+            return $this->jsonResponse("error", "Database error!", 500);
         }
 
         // Destroy  session
         session_unset();
         session_destroy();
 
-        return 'success';
+        return $this->jsonResponse("success", "User deleted successfully!");
     }
 
     // change password
@@ -222,25 +205,20 @@ class User extends Helper
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($password)) {
-            http_response_code(422);
-            return 'Password is required!';
+            return $this->jsonResponse("error", "Current password is required!", 422);
         }
         if (!v::stringType()->notEmpty()->validate($new_password)) {
-            http_response_code(422);
-            return 'New password is required!';
+            return $this->jsonResponse("error", "New password is required!", 422);
         }
         if (!v::stringType()->notEmpty()->validate($re_new_password)) {
-            http_response_code(422);
-            return 'Re-entered password is required!';
+            return $this->jsonResponse("error", "Re-entered password is required!", 422);
         }
         // Database validation
         if (!v::stringType()->length(1, 20)->validate($new_password)) {
-            http_response_code(422);
-            return 'Password is too long! (20 characters max)';
+            return $this->jsonResponse("error", "Password must be between 1 and 20 characters!", 422);
         }
         if ($new_password !== $re_new_password) {
-            http_response_code(422);
-            return 'Re-entered password does not match!';
+            return $this->jsonResponse("error", "Passwords do not match!", 422);
         }
         // Validate user
         $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user']['user_id']]);
@@ -248,22 +226,20 @@ class User extends Helper
         // Check password
         $user = $user[0]; // fetch first record
         if (!password_verify($password, $user['password'])) {
-            http_response_code(401);
-            return 'Invalid current password!';
+            return $this->jsonResponse("error", "Invalid password!", 401);
         }
 
         // Update password
         $result = DBHandle::query("UPDATE user SET password = :password WHERE user_id = :user_id", ['password' => password_hash($new_password, PASSWORD_DEFAULT), 'user_id' => $_SESSION['user']['user_id']]);
         if (!$result) {
-            http_response_code(500);
-            return 'Database error!';
+            return $this->jsonResponse("error", "Database error!", 500);
         }
 
         // Destroy  session
         unset($_SESSION['user']);
 
         CsrfToken::clearCSRFToken();
-        return 'success';
+        return $this->jsonResponse("success", "Password changed successfully!");
     }
 
     // give forgot password page
@@ -273,8 +249,7 @@ class User extends Helper
 
         // Form validation
         if (!v::email()->validate($email)) {
-            http_response_code(422);
-            return 'Email is required!';
+            return $this->jsonResponse("error", "Email is required!", 422);
         }
 
         // Validate user
@@ -283,8 +258,7 @@ class User extends Helper
         // Check email exists
 
         if (!$user) {
-            http_response_code(401);
-            return 'Email not found!';
+            return $this->jsonResponse("error", "Email does not exist!", 401);
         }
         $user = $user[0];
 
@@ -294,7 +268,7 @@ class User extends Helper
         $mail->setContentResetPassword();
         $mail->sendMail();
 
-        return 'success';
+        return $this->jsonResponse("success", "Email sent successfully!");
     }
 
     // give new password page
@@ -327,51 +301,52 @@ class User extends Helper
 
         // Form validation
         if (!v::stringType()->notEmpty()->validate($id)) {
-            http_response_code(422);
-            return 'ID is required!';
+            return $this->jsonResponse("error", "ID is required!", 422);
         }
         if (!v::notEmpty()->email()->validate($email)) {
-            http_response_code(422);
-            return 'Email is required!';
+            return $this->jsonResponse("error", "Email is required!", 422);
         }
         if (!v::stringType()->notEmpty()->validate($new_password)) {
-            http_response_code(422);
-            return 'New password is required!';
+            return $this->jsonResponse("error", "New password is required!", 422);
         }
         if (!v::stringType()->notEmpty()->validate($re_new_password)) {
-            http_response_code(422);
-            return 'Re-entered password is required!';
+            return $this->jsonResponse("error", "Re-entered password is required!", 422);
         }
         // Database validation
         if (!v::stringType()->length(1, 20)->validate($new_password)) {
-            http_response_code(422);
-            return 'Password is too long! (20 characters max)';
+            return $this->jsonResponse("error", "Password must be between 1 and 20 characters!", 422);
         }
         if ($new_password !== $re_new_password) {
-            http_response_code(422);
-            return 'Re-entered password does not match!';
+            return $this->jsonResponse("error", "Passwords do not match!", 422);
         }
         // Validate user
         $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id AND email = :email", ['user_id' => $id, 'email' => $email]);
         // Check email exists
         $user = $user[0];
         if (!$user) {
-            http_response_code(401);
-            return 'User not found!';
+            return $this->jsonResponse("error", "Email does not exist!", 401);
         }
 
         // Update password
         $result = DBHandle::query("UPDATE user SET password = :password WHERE user_id = :user_id", ['password' => password_hash($new_password, PASSWORD_DEFAULT), 'user_id' => $id]);
         if (!$result) {
-            http_response_code(500);
-            return 'Database error!';
+            return $this->jsonResponse("error", "Database error!", 500);
         }
 
         // Destroy  session
         unset($_SESSION['user']);
 
         CsrfToken::clearCSRFToken();
-        return 'success';
+        return $this->jsonResponse("success", "Password changed successfully!");
+    }
+
+    public function getHiddenHtml(): string
+    {
+        if (!isset($_SESSION['forgot'])) {
+            return '';
+        }
+        return '<input type="hidden" name="id" value="' . $_SESSION['forgot']['user_id'] . '">
+                <input type="hidden" name="email" value="' . $_SESSION['forgot']['email'] . '">';
     }
 
 }

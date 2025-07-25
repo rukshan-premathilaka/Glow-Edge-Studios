@@ -24,13 +24,10 @@ $router = new RouteCollector();
 
 
 
-
-
 /* --- MIDDLEWARE --- */
 $router->filter('auth', [Auth::class, 'handle']);
 $router->filter('authAdmin', [Auth::class, 'isAdmin']);
 $router->filter('csrf', [CsrfToken::class, 'validate']);
-
 
 /* --- CSRF TOKEN --- */
 $router->get('/csrf', function () {
@@ -45,35 +42,30 @@ $router->get('/home', function () {
     require 'views/home.php';
 });
 
-
-/*  --- FORGOT PASSWORD --- */
-$router->get('/forgot_password', function () {
-    require 'views/user/forgot_password.php';
-});
-$router->get('/new_password',  [User::class, 'getNewPasswordPage']);
-$router->group(['before' => 'csrf'], function (RouteCollector $r) {
-    $r->post('/forgot_password',  [User::class, 'forgotPassword']);  // send email
-    $r->post('/new_password',  [User::class, 'setNewPassword']); // add new password
-});
-
 /* --- USER ROUTE GROUP --- */
 $router->group(['prefix' => 'user'], function (RouteCollector $r) {
     $r->get('/signup', function () {
         require 'views/user/signup.php';
-    });
+    }); // give signup page
     $r->get('/login', function () {
         require 'views/user/login.php';
-    });
+    }); // give login page
+    $r->get('/forgot_password', function () {
+        require 'views/user/forgot_password.php';
+    });   // give forgot password page
+    $r->get('/new_password',  [User::class, 'getNewPasswordPage']);  // give new password page from email
     $r->group(['before' => 'csrf'], function (RouteCollector $r) {
-        $r->post('/signup',  [User::class, 'create']);
-        $r->Post('/login',  [User::class, 'login']);
+        $r->post('/signup',  [User::class, 'create']); // create new user account
+        $r->Post('/login',  [User::class, 'login']); // login
+        $r->post('/forgot_password',  [User::class, 'forgotPassword']);  // send email
+        $r->post('/new_password',  [User::class, 'setNewPassword']); // add new password
         $r->group(['before' => 'auth'], function (RouteCollector $r) {
-            $r->post('/logout', [User::class, 'logout']);
-            $r->post('/delete', [User::class, 'delete']);
+            $r->post('/logout', [User::class, 'logout']); // logout
+            $r->post('/delete', [User::class, 'delete']); // delete user
             $r->get('/change_password', function () {
                 require 'views/user/change_password.php';
-            });
-            $r->post('/change_password',  [User::class, 'setPassword']);
+            }); // give change password page
+            $r->post('/change_password',  [User::class, 'setPassword']); // change password
         });
     });
 });
@@ -87,8 +79,9 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], function (RouteCo
     $r->group(['prefix' => 'portfolio'], function (RouteCollector $r) {
         $r->post('/add', [Admin::class, 'addPortfolioItem']);
     });
-
 });
+
+
 
 
 

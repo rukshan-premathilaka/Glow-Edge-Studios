@@ -2,10 +2,11 @@
 
 namespace middleware;
 
+use controller\Helper;
 use Random\RandomException;
 
 
-class CsrfToken
+class CsrfToken extends Helper
 {
 
     private bool $tokenCheck = true;
@@ -53,24 +54,21 @@ class CsrfToken
         // Check if token and session token are valid strings
         if (!is_string($token) || !is_string($sessionToken)) {
             $this->clear();
-            http_response_code(401);
-            echo "Unauthorized request";
+            echo $this->jsonResponse("error", "Unauthorized request", 401);
             exit;
         }
 
         // Compare tokens
         if ($token !== $sessionToken) {
             $this->clear();
-            http_response_code(401);
-            echo "Unauthorized request: invalid token";
+            echo $this->jsonResponse("error", "Unauthorized request - invalid token", 401);
             exit;
         }
 
         // Check expiration
         if ($this->isExpired()) {
             $this->clear();
-            http_response_code(401);
-            echo "Unauthorized request: token expired, please refresh the page";
+            echo $this->jsonResponse("error", "Unauthorized request - token expired", 401);
             exit;
         }
 
@@ -127,14 +125,6 @@ class CsrfToken
     public function getTokenName(): string
     {
         return $this->tokenName;
-    }
-
-    // Session start
-    protected function ensureSession(): void
-    {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
     }
 
 }

@@ -2,22 +2,22 @@
 
 namespace controller;
 
-class Service
+class Service extends Helper
 {
 
 
-    public function add(): bool
+    public function add(): string
     {
-        return true;
+        return $this->jsonResponse("success", "Service added!");
     }
 
-    public function update(): bool
+    public function update(): string
     {
-        return true;
+        return $this->jsonResponse("success", "Service updated!");
     }
 
-    public function delete(): bool
+    public function delete(): string
     {
-        return true;
+        return $this->jsonResponse("success", "Service deleted!");
     }
 }

@@ -46,6 +46,15 @@ composer.json        # Project dependencies
 ```
 
 ---
+## ✅ Requirements
+
+- PHP 8.2 or higher
+- Composer
+- Node.js
+- npm
+- MySQL
+
+---
 
 ## 🚀 Getting Started
 
@@ -62,6 +71,15 @@ cd glow-edge-studios
 composer install
 ```
 
+### 3. Create the database
+
+```bash
+mysql -u root -p -e "CREATE DATABASE glow_edge_studios"
+```
+### 4. Import the database
+```bash
+Get-Content src/core/backup.sql | mysql -u root -p glow_edge_studios
+```
 ### 3. Setup environment
 
 Create a `.env` file in the root directory:
@@ -86,23 +104,27 @@ MAIL_SENDER='your_email_address'
 ```bash
 php -S localhost:8000
 ```
-
+Note: The server will run on `localhost:8000`
 ---
 
-## ✅ Requirements
+## 👨‍💻 Authors
 
-- PHP 8.2 or higher
-- Composer
-- MySQL
+**Rasintha Rukshan Premathilaka (Develop php backend)**  
+📧 Email: rasintharukshanp@gmail.com
 
+**Example User ()**  
+📧 Email: example@gmail.com
+
+**Example User ()**  
+📧 Email: example@gmail.com
+
+**Example User ()**  
+📧 Email: example@gmail.com
+
+**Example User ()**  
+📧 Email: example@gmail.com
 ---
 
-## 👨‍💻 Author
-
-**Rasintha Rukshan (rukshan-premathilaka)**  
-📧 Email: rukshanprog@gmail.com
-
----
 
 ## 📄 License
 

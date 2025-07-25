@@ -25,7 +25,7 @@
         ?>
         <button type="submit">Sign in</button>
         <a href="/user/signup">Create new account</a>
-        <a href="/forgot_password">Forgot password</a>
+        <a href="/user/forgot_password">Forgot password</a>
     </form>
 
 </body>

@@ -17,5 +17,25 @@ class Helper
         return isset($_GET[$key]) ? trim($_GET[$key]) : '';
     }
 
+    protected function jsonResponse($status, $message, $code = 200, $data = null): string
+    {
+        http_response_code($code);
+        header('Content-Type: application/json');
+        $response = [
+            'status' => $status,
+            'message' => $message
+        ];
+
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+
+        try {
+            return json_encode($response, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            die($e->getMessage());
+        }
+    }
+
 
 }

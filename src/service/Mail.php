@@ -92,7 +92,7 @@ class Mail
                             <h1>Hello, ' . htmlspecialchars($this->receiver) . '!</h1>
                             <h2 style="color: #333;">Please reset your password</h2>
                             <p style="color: #555;">Click the button below to reset your password:</p>
-                            <a href="http://' . $_SERVER['HTTP_HOST'] . '/new_password?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
+                            <a href="http://' . $_SERVER['HTTP_HOST'] . '/user/new_password?key=' . urlencode($this->token) . '&id=' . urlencode($this->userId) . '&email=' . urlencode($this->receiverAddress) . '"
                                style="display: inline-block; background-color: #007BFF; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                                 Reset Password
                             </a>

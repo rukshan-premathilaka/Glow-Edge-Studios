@@ -6,45 +6,46 @@ use core\DBHandle;
 use middleware\CsrfToken;
 use Respect\Validation\Validator as v;
 
-class Portfolio
+class Portfolio extends Helper
 {
-    private string $title;
-    private string $description;
-    private String $image;
-    private int $authorId;
-
-
-    public function addItem(string $title, string $description, string $image, int $authorId): string
+    public function __construct()
     {
-        $this->title = $title;
-        $this->description = $description;
-        $this->image = $image;
-        $this->authorId = $authorId;
 
+    }
+
+    public function add(string $title, string $description, string $image, int $authorId): string
+    {
         $result = DBHandle::query("INSERT INTO portfolio (title, description, image) VALUES (:title, :description, :image)", [
-            'title' => $this->title,
-            'description' => $this->description,
-            'image' => $this->image
+            'title' => $title,
+            'description' => $description,
+            'image' => $image
         ]);
 
         if (!$result) {
-            http_response_code(500);
-            return 'Database error';
+            return $this->jsonResponse("error", "Database error: Portfolio item not added!", 500);
         }
 
-
-
-
-        return 'success';
+        return $this->jsonResponse("success", "Portfolio item added!");
     }
 
-    public function updateItem(): string
+    public function update(): string
     {
-        return 'success';
+        return $this->jsonResponse("success", "Portfolio item updated!");
     }
 
-    public function deleteItem(): string
+    public function delete(): string
     {
-        return 'success';
+        return $this->jsonResponse("success", "Portfolio item deleted!");
+    }
+
+    public static function getAll(): array
+    {
+        $result = DBHandle::query("SELECT * FROM portfolio");
+
+        if (!$result) {
+            die("Database error: Portfolio items not found!");
+        }
+
+        return $result;
     }
 }

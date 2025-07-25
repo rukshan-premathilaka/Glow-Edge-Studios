@@ -10,7 +10,7 @@
 
     <h1>Change password</h1>
 
-    <form method="POST" action="/forgot_password">
+    <form method="POST" action="/user/forgot_password">
         <label for="email">
             Enter your email
             <input type="email" name="email" required placeholder="Email"><br>
