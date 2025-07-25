@@ -123,6 +123,7 @@ Note: The server will run on `localhost:8000`
 
 **Example User ()**  
 📧 Email: example@gmail.com
+
 ---
 
 
