@@ -50,56 +50,62 @@ composer.json        # Project dependencies
 
 - PHP 8.2 or higher
 - Composer
-- Node.js
-- npm
 - MySQL
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
+### 1. Create a new folder
+We recommend creating a new folder for the project. For example, you can create a folder named `glow-edge-studios`
+If you use server software like Apache or Nginx, use the htdocs folder to host the project.
 
+### 2. Open that folder in your IDE and run the following commands in the terminal
+
+### 3. Clone the repository
+
+This will clone the repository to the current directory from GitHub.
 ```bash
-git clone https://github.com/rukshan-premathilaka/Glow-Edge-Studios.git
-cd glow-edge-studios
+git git clone https://github.com/rukshan-premathilaka/Glow-Edge-Studios.git .
 ```
 
 ### 2. Install dependencies
 
+This will install the required dependencies using Composer. Make sure you have Composer installed on your system.
 ```bash
 composer install
 ```
 
 ### 3. Create the database
 
+This will create a new database called `glow_edge_studios`. Make sure you have MySQL installed on your system.
 ```bash
-mysql -u root -p -e "CREATE DATABASE glow_edge_studios"
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS glow_edge_studios"
 ```
 ### 4. Import the database
+This will import the database from the `backup.sql` file. 
 ```bash
 Get-Content src/core/backup.sql | mysql -u root -p glow_edge_studios
 ```
 ### 3. Setup environment
 
-Create a `.env` file in the root directory:
-
+Create a `.env` file in the root directory. After that, add the following lines to the file with your own values:
 ```ini
 # Database Config
 DB_HOST=localhost
 DB_NAME=glow_edge_studios
-DB_USER=your_mysql_username
-DB_PASS=your_mysql_password
+DB_USER='your mysql username'
+DB_PASS='your mysql password'
 DB_PORT=3306
 DB_CHARSET=utf8mb4
 
 # Mail Config
-MAIL_USERNAME='your_name'
-MAIL_PASSWORD='your_gmail_app_password'
+MAIL_USERNAME='your name or email address'
+MAIL_PASSWORD='your gmail app password (NOT your gmail password)'
 MAIL_SENDER='your_email_address'
 ```
 
-### 4. Run the server (for development)
+### 4. Start the server (for development)
 
 ```bash
 php -S localhost:8000
