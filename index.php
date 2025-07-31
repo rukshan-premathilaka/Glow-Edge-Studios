@@ -71,7 +71,7 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
 });
 
 /* --- ADMIN ROUTE GROUP --- */
-$router->group(['prefix' => 'admin', 'before' => 'authAdmin'], function (RouteCollector $r) {
+$router->group(['prefix' => 'admin', 'before' => 'authAdmin'], callback: function (RouteCollector $r) {
     $r->get('/dashboard', function () {
         require 'views/admin/dashboard.php';
     });
