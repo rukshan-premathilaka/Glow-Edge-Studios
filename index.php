@@ -75,9 +75,13 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], function (RouteCo
     $r->get('/dashboard', function () {
         require 'views/admin/dashboard.php';
     });
-    /* --- PORTFOLIO --- */
-    $r->group(['prefix' => 'portfolio'], function (RouteCollector $r) {
-        $r->post('/add', [Admin::class, 'addPortfolioItem']);
+    $r->group(['before' => 'csrf'], function (RouteCollector $r) {
+        /* --- PORTFOLIO --- */
+        $r->group(['prefix' => 'portfolio'], function (RouteCollector $r) {
+            $r->post('/add', [Admin::class, 'addPortfolioItem']);
+            $r->post('/update', [Admin::class, 'updatePortfolioItem']);
+            $r->post('/delete', [Admin::class, 'deletePortfolioItem']);
+        });
     });
 });
 

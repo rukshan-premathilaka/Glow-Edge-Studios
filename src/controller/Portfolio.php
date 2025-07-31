@@ -3,8 +3,6 @@
 namespace controller;
 
 use core\DBHandle;
-use middleware\CsrfToken;
-use Respect\Validation\Validator as v;
 
 class Portfolio extends Helper
 {
@@ -13,7 +11,7 @@ class Portfolio extends Helper
 
     }
 
-    public function add(string $title, string $description, string $image, int $authorId): string
+    public function add(string $title, string $description, string $image): string
     {
         $result = DBHandle::query("INSERT INTO portfolio (title, description, image) VALUES (:title, :description, :image)", [
             'title' => $title,
@@ -28,13 +26,22 @@ class Portfolio extends Helper
         return $this->jsonResponse("success", "Portfolio item added!");
     }
 
-    public function update(): string
+    public function update(int $id, string $title, string $description, string $image): string
     {
+
         return $this->jsonResponse("success", "Portfolio item updated!");
     }
 
-    public function delete(): string
+    public function delete(int $id): string
     {
+        $result = DBHandle::query("DELETE FROM portfolio WHERE portfolio_id = :id", [
+            'id' => $id
+        ]);
+
+        if (!$result) {
+            return $this->jsonResponse("error", "Database error: Portfolio item not deleted!", 500);
+        }
+
         return $this->jsonResponse("success", "Portfolio item deleted!");
     }
 

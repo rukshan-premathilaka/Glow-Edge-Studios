@@ -51,6 +51,7 @@ composer.json        # Project dependencies
 - PHP 8.2 or higher
 - Composer
 - MySQL
+- Node.js
 
 ---
 
@@ -64,14 +65,14 @@ If you use server software like Apache or Nginx, use the htdocs folder to host t
 
 ### 3. Clone the repository
 
-This will clone the repository to the current directory from GitHub.
+This will clone the repository to the current directory from GitHub. Make sure you have git installed and set path variable on your system.
 ```bash
-git git clone https://github.com/rukshan-premathilaka/Glow-Edge-Studios.git .
+git clone https://github.com/rukshan-premathilaka/Glow-Edge-Studios.git .
 ```
 
 ### 2. Install dependencies
 
-This will install the required dependencies using Composer. Make sure you have Composer installed on your system.
+This will install the required dependencies using Composer. Make sure you have Composer installed on your system. 
 ```bash
 composer install
 ```
@@ -89,7 +90,7 @@ Get-Content src/core/backup.sql | mysql -u root -p glow_edge_studios
 ```
 ### 3. Setup environment
 
-Create a `.env` file in the root directory. After that, add the following lines to the file with your own values:
+Update the `.env` file with your own values. In the root directory.
 ```ini
 # Database Config
 DB_HOST=localhost

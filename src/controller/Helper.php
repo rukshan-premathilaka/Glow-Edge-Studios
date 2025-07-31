@@ -8,7 +8,7 @@ class Helper
         return isset($_POST[$key]) ? trim($_POST[$key]) : '';
     }
 
-    protected function inputPImage(string $key): array {
+    protected function PostInputFile(string $key): array {
         return $_FILES[$key] ?? [];
     }
 

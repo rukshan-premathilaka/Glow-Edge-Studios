@@ -3,13 +3,13 @@
 namespace middleware;
 
 use controller\Helper;
-use Random\RandomException;
+use Exception;
 
 
 class CsrfToken extends Helper
 {
 
-    private bool $tokenCheck = true;
+    private bool $tokenCheck = false;
     protected string $tokenName = '_csrf_token';
 
     public function __construct()
@@ -28,7 +28,7 @@ class CsrfToken extends Helper
                     'value' => bin2hex(random_bytes(32)),
                     'expires' => time() + $tokenExpirySeconds,
                 ];
-            } catch (RandomException $e) {
+            } catch (Exception $e) {
                 error_log('CSRF token generation failed: ' . $e->getMessage());
             }
         }
