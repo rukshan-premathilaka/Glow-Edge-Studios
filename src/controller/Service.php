@@ -2,9 +2,17 @@
 
 namespace controller;
 
+use core\DBHandle;
+
 class Service extends Helper
 {
 
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
 
     public function add(): string
     {
@@ -20,4 +28,11 @@ class Service extends Helper
     {
         return $this->jsonResponse("success", "Service deleted!");
     }
+
+    public static function count(): string
+    {
+        $count = DBHandle::query('SELECT COUNT(*) as services_count FROM services');
+        return (string) $count[0]['services_count'];
+    }
+
 }

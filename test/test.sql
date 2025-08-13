@@ -23,3 +23,30 @@ WHERE u.user_id = 30;
 
 # GET ALL PORTFOLIOS
 SELECT * FROM portfolio;
+
+# Service
+SELECT * FROM services;
+
+SELECT COUNT(*) as services_count FROM services;
+
+# Booking
+SELECT
+    b.user_user_id,
+    b.services_services_id,
+    b.client_message,
+    b.created_at,
+    b.status,
+    s.title service_title,
+    s.price service_price,
+    u.name user_name,
+    u.email user_email
+FROM
+    bookings b
+        INNER JOIN
+    services s ON b.services_services_id = s.services_id
+        INNER JOIN
+    user u ON b.user_user_id = u.user_id
+ORDER BY
+    b.created_at;
+
+SELECT COUNT(*) as booking_count FROM bookings;

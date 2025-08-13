@@ -268,7 +268,7 @@ class User extends Helper
         $mail->setContentResetPassword();
         $mail->sendMail();
 
-        return $this->jsonResponse("success", "Email sent successfully!");
+        return $this->jsonResponse("success", "Please check your email. Email expired in 1 minute.");
     }
 
     // give new password page

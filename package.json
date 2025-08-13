@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "tailwindcss": "^4.1.11"
+  },
+  "name": "glow-edge-studios",
+  "version": "1.0.0",
+  "description": "**Glow Edge Studios** is an online booking web application designed for a company that provides **graphic designing** and **photography services**. The main goal of this platform is to make it easy for clients to book a graphic designer or photographer online — fast, secure, and hassle-free.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx @tailwindcss/cli -i ./public/css/tailwindcss/input.css -o ./public/css/tailwindcss/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rukshan-premathilaka/Glow-Edge-Studios.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rukshan-premathilaka/Glow-Edge-Studios/issues"
+  },
+  "homepage": "https://github.com/rukshan-premathilaka/Glow-Edge-Studios#readme"
+}

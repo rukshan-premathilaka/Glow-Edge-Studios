@@ -85,8 +85,26 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], callback: functio
     });
 });
 
+/* --- CLIENT ROUTE GROUP --- */
+$router->group(['prefix' => 'client', 'before' => 'auth'], callback: function (RouteCollector $r) {
+    $r->get('/dashboard', function () {
+        require 'views/client/dashboard.php';
+    });
+    $r->get('/chat', function () {
+        require 'views/client/chat.php';
+    });
+    $r->get('/Adminchat', function () {
+        require 'views/admin/chat.php';
+    });
 
-
+    $r->get('/booking', function () {
+        require 'views/client/booking.php';
+    });
+    $r->group(['before' => 'csrf'], function (RouteCollector $r) {
+        $r->post('/submit_contact_form', [Admin::class, 'submitContactForm']);
+        $r->post('/submit_booking_request', [Admin::class, 'submitBookingRequest']);
+    });
+});
 
 
 

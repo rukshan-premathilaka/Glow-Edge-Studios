@@ -9,7 +9,7 @@ use Exception;
 class CsrfToken extends Helper
 {
 
-    private bool $tokenCheck = false;
+    private bool $tokenCheck = true;
     protected string $tokenName = '_csrf_token';
 
     public function __construct()

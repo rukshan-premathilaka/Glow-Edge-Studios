@@ -8,7 +8,9 @@ class Portfolio extends Helper
 {
     public function __construct()
     {
-
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     public function add(string $title, string $description, string $image): string
@@ -45,14 +47,14 @@ class Portfolio extends Helper
         return $this->jsonResponse("success", "Portfolio item deleted!");
     }
 
-    public static function getAll(): array
+    public function getAll(): array
     {
-        $result = DBHandle::query("SELECT * FROM portfolio");
+        return DBHandle::query("SELECT * FROM portfolio");
+    }
 
-        if (!$result) {
-            die("Database error: Portfolio items not found!");
-        }
-
-        return $result;
+    public function getCount(): string
+    {
+        $data = DBHandle::query('SELECT COUNT(*) as portfolio FROM portfolio');
+        return (string) $data[0]['portfolio'];
     }
 }

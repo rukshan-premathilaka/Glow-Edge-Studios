@@ -56,7 +56,6 @@ class Mail
             $mail->Body    = $this->body;
 
             $mail->send();
-            echo 'Email has been sent!';
         } catch (Exception $e) {
             echo "Email could not be sent. Error: {$mail->ErrorInfo}";
         }

@@ -1,0 +1,370 @@
+/* Reset */
+* {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #fafafa;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Hide page content initially */
+.hidden {
+    display: none;
+}
+
+/* Intro Video Fullscreen */
+#intro-video-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 1.5s ease;
+}
+
+#intro-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Header with light background */
+header {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    background: #F5F0F7; /* light lavender/white */
+    color: #5B2C6F; /* dark purple */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 30px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(91, 44, 111, 0.15);
+}
+
+/* Logo styling */
+header .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+header .logo img {
+    height: 48px;
+}
+
+header .logo h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: #5B2C6F; /* dark purple */
+}
+
+/* Navigation */
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+/* Nav links dark color by default */
+header nav ul li a {
+    color: #5B2C6F; /* dark purple */
+    text-decoration: none;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #840a51; /* maroon */
+    color: white;
+}
+
+/* Active and hover state: bright yellow background with dark text */
+header nav ul li a.active,
+header nav ul li a:hover {
+
+    color: #deb0f1; /* dark purple */
+    font-weight: 700;
+    background-color: #840a51; /* maroon */
+
+    color: white;
+}
+
+/* Special button style for Sign Up */
+header nav ul li .btn {
+
+    color: #dcc0e8; /* dark purple */
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-weight: 700;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #840a51; /* maroon */
+
+    color: white;
+}
+
+header nav ul li .btn:hover {
+    background-color: #840a51; /* maroon */
+
+    color: white;
+}
+
+/* Hero Section */
+.hero {
+    margin-top: 70px;
+    height: 90vh;
+    background: url('/assets/ui/Backround.jpg') center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 20px;
+    position: relative;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(91, 44, 111, 0.6);
+    z-index: 0;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+}
+
+.hero-text h2 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+}
+
+.hero-text p {
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Services Section */
+.services {
+    padding: 60px 20px;
+    text-align: center;
+    background: #f9f7f8; /* light off-white */
+}
+
+.services h2 {
+    font-size: 2.8rem;
+    color: #5B2C6F; /* purple */
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+.services-gallery {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.service-item {
+    max-width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(91, 44, 111, 0.15);
+    padding: 20px;
+    transition: transform 0.3s ease;
+    cursor: default;
+}
+
+.service-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(91, 44, 111, 0.3);
+}
+
+.service-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.service-item h3 {
+    color: #A93226; /* maroon */
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.service-item p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+/* Contact Us Section */
+.contact-us {
+    padding: 50px 20px;
+    background-color: #5B2C6F; /* deep purple */
+    color: #F4D03F; /* bright yellow */
+    text-align: center;
+}
+
+.contact-us h2 {
+    font-size: 2.8rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #f2f1ed; /* off-white/yellowish */
+}
+
+.contact-us p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    font-weight: 600;
+}
+
+.contact-us a {
+    color: #A93226; /* maroon */
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+.contact-us a:hover {
+    color: #2874A6; /* blue */
+    text-decoration: underline;
+}
+
+/* About Us Section */
+.about-us {
+    padding: 40px 20px;
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #7D0642; /* dark maroon/purple */
+    color: #F4D03F; /* bright yellow */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(91,44,111,0.2);
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    font-weight: 600;
+}
+
+/* Footer */
+footer {
+    background-color: #5B2C6F;
+    color: #F4D03F;
+    text-align: center;
+    padding: 15px 20px;
+    margin-top: auto;
+    font-weight: 600;
+}
+
+/* Form container (used in other pages) */
+.form-container {
+    max-width: 400px;
+    background: white;
+    margin: 100px auto 40px;
+    padding: 30px 30px 35px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(91,44,111,0.3);
+}
+
+.form-container h2 {
+    color: #5B2C6F;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.form-container input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 2px solid #A93226; /* maroon */
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-container input:focus {
+    border-color: #2874A6; /* blue */
+    outline: none;
+}
+
+.form-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #5B2C6F; /* purple */
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.form-container button:hover {
+    background-color: #2874A6; /* blue */
+}
+
+.form-container p {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.form-container p a {
+    color: #A93226; /* maroon */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-container p a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .services-gallery {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        gap: 10px;
+        background-color: #5B2C6F;
+        position: fixed;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        padding: 20px;
+        display: none;
+        border-radius: 0 0 0 12px;
+    }
+
+    header nav ul.active {
+        display: flex;
+    }
+}
