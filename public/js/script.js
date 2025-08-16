@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+/*document.addEventListener('DOMContentLoaded', () => {
 
     const navLinks = document.querySelectorAll('header nav ul li a');
     const sections = {
@@ -60,4 +60,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-});
+});*/

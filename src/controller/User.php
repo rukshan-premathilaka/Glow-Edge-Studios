@@ -174,11 +174,28 @@ class User extends Helper
             return $this->jsonResponse("error", "Password is required!", 422);
         }
 
+
         // Validate user
-        $user = DBHandle::query("SELECT * FROM user WHERE user_id = :user_id", ['user_id' => $_SESSION['user']['user_id']]);
+        $user = DBHandle::query("
+            SELECT
+                *
+            FROM user
+                INNER JOIN user_has_role ON user.user_id = user_has_role.user_user_id
+                INNER JOIN role  ON user_has_role.role_role_id = role.role_id
+            WHERE user.user_id = :user_id AND role.role = 'admin';",
+            [
+                'user_id' => $_SESSION['user']['user_id']
+            ]
+        );
+
+        $user = $user[0]; // fetch first record
+
+        // check if user admin
+        if ($user['role'] === 'admin') {
+            return $this->jsonResponse("error", "You cannot delete your admin account!", 401);
+        }
 
         // Check password
-        $user = $user[0]; // fetch first record
         if (!password_verify($password, $user['password'])) {
             return $this->jsonResponse("error", "Invalid password!", 401);
         }
@@ -271,6 +288,64 @@ class User extends Helper
         return $this->jsonResponse("success", "Please check your email. Email expired in 1 minute.");
     }
 
+    // update user
+    public function update(): string
+    {
+
+        $email = $this->PostInput('email');
+        $name = $this->PostInput('name');
+        $phone = $this->PostInput('phone');
+        $address = $this->PostInput('address');
+        $whatsapp = $this->PostInput('whatsapp');
+        $profile_image = $this->PostInputFile('profilePic');
+
+        // Form validation
+        if (!v::email()->validate($email)) {
+            return $this->jsonResponse("error", "This email is not valid!", 422);
+        }
+        if (!v::stringType()->notEmpty()->length(1, 255)->validate($name)) {
+            return $this->jsonResponse("error", "Name must be between 1 and 255 characters!", 422);
+        }
+        if (!v::stringType()->length(1, 15)->phone()->validate($phone)) {
+            return $this->jsonResponse("error", "Wrong phone number format!", 422);
+        }
+        if (!v::notEmpty()->stringType()->validate($address)) {
+            return $this->jsonResponse("error", "Wrong address format!", 422);
+        }
+        if (!v::notEmpty()->stringType()->length(1, 15)->phone()->validate($whatsapp)) {
+            return $this->jsonResponse("error", "Wrong whatsapp number format!", 422);
+        }
+
+        $query = "UPDATE user SET email = :email, name = :name, phone = :phone, address = :address, whatsapp = :whatsapp";
+        $params = [
+            'email' => $email,
+            'name' => $name,
+            'phone' => $phone,
+            'address' => $address,
+            'whatsapp' => $whatsapp,
+            'user_id' => $_SESSION['user']['user_id']
+        ];
+
+        if (!empty($profile_image['name'])) {
+            $image = $this->uploadImage($profile_image);
+            if ($image['status'] === 'error') {
+                return $image['response'];
+            }
+            $query .= ", profile_pic = :profile_image";
+            $params['profile_image'] = $image['name'];
+        }
+
+        $query .= " WHERE user_id = :user_id";
+
+        $result = DBHandle::query($query, $params);
+
+        if (!$result) {
+            return $this->jsonResponse("error", "Database error!", 500);
+        }
+
+        return $this->jsonResponse("success", "Profile updated!");
+    }
+
     // give new password page
     public function getNewPasswordPage() : void
     {
@@ -340,6 +415,7 @@ class User extends Helper
         return $this->jsonResponse("success", "Password changed successfully!");
     }
 
+    // get hidden html
     public function getHiddenHtml(): string
     {
         if (!isset($_SESSION['forgot'])) {
@@ -349,4 +425,32 @@ class User extends Helper
                 <input type="hidden" name="email" value="' . $_SESSION['forgot']['email'] . '">';
     }
 
+    public function getUserData(): array
+    {
+        $data =  DBHandle::query("SELECT user_id, name, email, phone, address, whatsapp FROM user where user_id = :user_id;",['user_id' => $_SESSION['user']['user_id']]);
+        return $data[0];
+    }
+
+    public function getProfilePic(): string
+    {
+        $data = DBHandle::query(
+            "SELECT profile_pic, name FROM user WHERE user_id = :user_id;",
+            ['user_id' => $_SESSION['user']['user_id']]
+        );
+
+        if(!empty($data[0]['profile_pic'])) {
+            return '/public/assets/upload/' . $data[0]['profile_pic'];
+        }
+
+        $words = explode(" ", trim($data[0]['name']));
+        $initials = "";
+
+        foreach ($words as $w) {
+            if (!empty($w)) {
+                $initials .= strtoupper($w[0]);
+            }
+        }
+
+        return 'https://placehold.co/100x100/E2E8F0/4A5568?text=' . substr($initials, 0, 2);
+    }
 }

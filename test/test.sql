@@ -50,3 +50,34 @@ ORDER BY
     b.created_at;
 
 SELECT COUNT(*) as booking_count FROM bookings;
+
+# get all user data
+
+SELECT
+    user_id,
+    name,
+    email,
+    phone,
+    address,
+    whatsapp,
+    profile_pic
+FROM
+    user
+where user_id = :user_id;
+
+# update user data
+
+UPDATE
+    user
+SET
+    profile_pic = null
+WHERE
+    user_id = 30;
+
+
+SELECT
+    user.user_id, user.name, role.role
+FROM user
+    INNER JOIN user_has_role ON user.user_id = user_has_role.user_user_id
+    INNER JOIN role  ON user_has_role.role_role_id = role.role_id
+WHERE user.user_id = :user_id AND role.role = 'admin';

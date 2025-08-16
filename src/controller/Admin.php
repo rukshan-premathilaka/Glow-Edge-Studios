@@ -59,36 +59,6 @@ class Admin extends Helper
         return (new Portfolio())->delete((int) $id);
     }
 
-    private function uploadImage(array $image): string
-    {
-        // Validate image
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/svg'];
-        $maxSize = 10 * 1024 * 1024; // 10MB
-
-        if (!in_array($image['type'], $allowedTypes, true)) {
-            return $this->jsonResponse("error", "Only JPG, PNG, and SVG images are allowed!", 422);
-        }
-        if ($image['size'] > $maxSize) {
-            return $this->jsonResponse("error", "Image size should be less than 10MB!", 422);
-        }
-
-        // Upload directory
-        $uploadDir = __DIR__ . '/../../public/uploads/';
-
-        // Generate unique  filename
-        $extension = pathinfo($image['name'], PATHINFO_EXTENSION);
-        $uniqueName = uniqid('img_', true) . '_' . $extension;
-
-        // Full path
-        $uploadFile = $uploadDir . $uniqueName;
-
-        // Upload file
-        if (!move_uploaded_file($image['tmp_name'], $uploadFile)) {
-            die($this->jsonResponse("error", "Image upload failed!", 500));
-        }
-
-        return $uniqueName;
-    }
 }
 
 

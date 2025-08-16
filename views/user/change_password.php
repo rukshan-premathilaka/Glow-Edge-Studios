@@ -16,14 +16,23 @@
 
 <main class="form-container">
     <h2>Reset Password</h2>
-    <form id="resetForm" action="/user/change_password" method="POST">
+    <form id="resetPassword" action="/user/change_password" method="POST">
+        <input type="password"  placeholder="Current Password" required />
         <input type="password"  placeholder="New Password" required />
         <input type="password" placeholder="Confirm Password" required />
         <button type="submit">Reset Password</button>
+
+        <!-- CSRF Token -->
+        <?php
+        use middleware\CsrfToken;
+        $csrf = new CsrfToken();
+        echo $csrf->getInputHtml();
+        ?>
+
     </form>
 </main>
 
 <script src="/public/js/script.js"></script>
-<script type="module" src="/public/js/"></script>
+<script type="module" src="/public/"></script>
 </body>
 </html>

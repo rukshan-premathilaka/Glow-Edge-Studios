@@ -66,7 +66,16 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
                 require 'views/user/change_password.php';
             }); // give change password page
             $r->post('/change_password',  [User::class, 'setPassword']); // change password
+            $r->post('/update',  [User::class, 'update']); // update user
         });
+    });
+    $r->group(['before' => 'auth'], function (RouteCollector $r) {
+        $r->get('/profile_settings', function () {
+            require 'views/user/profile_setting.php';
+        }); // give profile setting page
+        $r->get('/my_booking', function () {
+            require 'views/user/my_booking.php';
+        }); // give my booking page
     });
 });
 
