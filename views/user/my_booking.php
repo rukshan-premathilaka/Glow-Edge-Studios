@@ -84,7 +84,7 @@ $Bookings = (new \controller\Booking())->getAllByUser();
       <?php
 
       if (empty($Bookings)) {
-          echo '<p>No bookings found.</p>';
+          echo '<br><br><p style="text-align: center;">No bookings found.</p>';
       }
 
       foreach ($Bookings as $booking) {
