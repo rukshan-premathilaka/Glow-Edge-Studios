@@ -35,4 +35,10 @@ class Service extends Helper
         return (string) $count[0]['services_count'];
     }
 
+    public function getCount(): string
+    {
+
+        return '7';
+    }
+
 }

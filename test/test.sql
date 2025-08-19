@@ -81,3 +81,24 @@ FROM user
     INNER JOIN user_has_role ON user.user_id = user_has_role.user_user_id
     INNER JOIN role  ON user_has_role.role_role_id = role.role_id
 WHERE user.user_id = :user_id AND role.role = 'admin';
+
+
+
+# get all bookings
+
+SELECT *
+FROM bookings b
+    INNER JOIN services s ON b.services_services_id = s.services_id
+    INNER JOIN user u ON b.user_user_id = u.user_id
+WHERE booking_id = :id;
+
+SELECT *
+FROM bookings
+WHERE booking_id = :id;
+
+
+SELECT *
+FROM bookings
+    INNER JOIN services s ON bookings.services_services_id = s.services_id
+    INNER JOIN user u ON bookings.user_user_id = u.user_id
+LIMIT :limit OFFSET :offset;

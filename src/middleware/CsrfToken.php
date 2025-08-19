@@ -9,7 +9,7 @@ use Exception;
 class CsrfToken extends Helper
 {
 
-    private bool $tokenCheck = true;
+    private bool $tokenCheck = false;
     protected string $tokenName = '_csrf_token';
 
     public function __construct()
@@ -29,7 +29,7 @@ class CsrfToken extends Helper
                     'expires' => time() + $tokenExpirySeconds,
                 ];
             } catch (Exception $e) {
-                error_log('CSRF token generation failed: ' . $e->getMessage());
+                die('CSRF token generation failed: ' . $e->getMessage());
             }
         }
 

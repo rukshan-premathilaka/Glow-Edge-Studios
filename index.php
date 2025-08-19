@@ -2,6 +2,7 @@
 
 require 'vendor/autoload.php';
 
+use controller\Booking;
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\RouteCollector;
 use controller\User;
@@ -67,6 +68,7 @@ $router->group(['prefix' => 'user'], function (RouteCollector $r) {
             }); // give change password page
             $r->post('/change_password',  [User::class, 'setPassword']); // change password
             $r->post('/update',  [User::class, 'update']); // update user
+            $r->post('/booking_details', [Booking::class, 'getDetails']);
         });
     });
     $r->group(['before' => 'auth'], function (RouteCollector $r) {
@@ -84,6 +86,26 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], callback: functio
     $r->get('/dashboard', function () {
         require 'views/admin/dashboard.php';
     });
+    $r->get('/bookings', function () {
+        require 'views/admin/bookings.php';
+    });
+    $r->get('/services', function () {
+        require 'views/admin/servicers.php';
+    });
+    $r->get('/portfolio', function () {
+        require 'views/admin/portfolio.php';
+    });
+    $r->get('/add_portfolio', function () {
+        require 'views/admin/add-portfolio.php';
+    });
+    $r->get('/add_service', function () {
+        require 'views/admin/add-servicers.php';
+    });
+    $r->get('/booking-details', function () {
+        require 'views/admin/Booking-details.php';
+    });
+
+
     $r->group(['before' => 'csrf'], function (RouteCollector $r) {
         /* --- PORTFOLIO --- */
         $r->group(['prefix' => 'portfolio'], function (RouteCollector $r) {
@@ -91,27 +113,14 @@ $router->group(['prefix' => 'admin', 'before' => 'authAdmin'], callback: functio
             $r->post('/update', [Admin::class, 'updatePortfolioItem']);
             $r->post('/delete', [Admin::class, 'deletePortfolioItem']);
         });
-    });
-});
-
-/* --- CLIENT ROUTE GROUP --- */
-$router->group(['prefix' => 'client', 'before' => 'auth'], callback: function (RouteCollector $r) {
-    $r->get('/dashboard', function () {
-        require 'views/client/dashboard.php';
-    });
-    $r->get('/chat', function () {
-        require 'views/client/chat.php';
-    });
-    $r->get('/Adminchat', function () {
-        require 'views/admin/chat.php';
-    });
-
-    $r->get('/booking', function () {
-        require 'views/client/booking.php';
-    });
-    $r->group(['before' => 'csrf'], function (RouteCollector $r) {
-        $r->post('/submit_contact_form', [Admin::class, 'submitContactForm']);
-        $r->post('/submit_booking_request', [Admin::class, 'submitBookingRequest']);
+        /*  --- BOOKINGS --- */
+        $r->group(['prefix' => 'booking'], function (RouteCollector $r) {
+            $r->post('/all', [Booking::class, 'getAll']);
+            $r->post('/confirm', [Booking::class, 'confirm']);
+            $r->post('/delete', [Booking::class, 'delete']);
+            $r->post('/cancel', [Booking::class, 'cancel']);
+        });
+        /*  --- SERVICES --- */
     });
 });
 

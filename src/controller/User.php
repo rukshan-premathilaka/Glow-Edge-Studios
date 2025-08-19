@@ -431,18 +431,30 @@ class User extends Helper
         return $data[0];
     }
 
-    public function getProfilePic(): string
+    public function getProfilePic(?int $userId = null): string
     {
+        // Use the provided user ID, otherwise use the session ID
+        $targetUserId = $userId ?? $_SESSION['user']['user_id'];
+
         $data = DBHandle::query(
             "SELECT profile_pic, name FROM user WHERE user_id = :user_id;",
-            ['user_id' => $_SESSION['user']['user_id']]
+            ['user_id' => $targetUserId]
         );
 
-        if(!empty($data[0]['profile_pic'])) {
-            return '/public/assets/upload/' . $data[0]['profile_pic'];
+        if (empty($data)) {
+            // Return a default placeholder if the user is not found
+            return 'https://placehold.co/100x100/E2E8F0/4A5568?text=NA';
         }
 
-        $words = explode(" ", trim($data[0]['name']));
+        $profilePic = $data[0]['profile_pic'];
+        $name = $data[0]['name'];
+
+        if (!empty($profilePic)) {
+            return '/public/assets/upload/' . $profilePic;
+        }
+
+        // Generate initials if no profile picture is set
+        $words = explode(" ", trim($name));
         $initials = "";
 
         foreach ($words as $w) {
@@ -452,5 +464,10 @@ class User extends Helper
         }
 
         return 'https://placehold.co/100x100/E2E8F0/4A5568?text=' . substr($initials, 0, 2);
+    }
+
+    public function getUserName(): string
+    {
+        return $_SESSION['user']['name'];
     }
 }

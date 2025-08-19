@@ -84,7 +84,7 @@ $data = $user->getUserData();
     </form>
   </div>
 
-  <script src="/public/js/user-panel.js"></script>
+
   <script type="module" src="/public/js/user/update_profile.js"></script>
   <script type="module" src="/public/js/user/logout.js"></script>
 </body>
