@@ -1,11 +1,10 @@
 <?php
 
-use controller\Service;
 use controller\Booking;
 use controller\Portfolio;
 use controller\User;
 use middleware\Auth;
-use middleware\CsrfToken;
+
 
 $booking = new Booking();
 $portfolio = new Portfolio();
