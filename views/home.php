@@ -62,7 +62,7 @@ $auth = new Auth();
 
         <!-- Desktop Menu -->
         <div class="hidden lg:flex items-center space-x-6">
-            <a href="#" class="text-gray-600 hover:brand-text transition-all-300">Home</a>
+            <a href="/home" class="text-gray-600 hover:brand-text transition-all-300">Home</a>
             <a href="#services" class="text-gray-600 hover:brand-text transition-all-300">Services</a>
             <a href="#portfolio" class="text-gray-600 hover:brand-text transition-all-300">Portfolio</a>
             <a href="#testimonials" class="text-gray-600 hover:brand-text transition-all-300">About Us</a>
@@ -72,15 +72,15 @@ $auth = new Auth();
         <!-- Sign Up / Sign In Buttons -->
         <div class="hidden lg:flex items-center space-x-4">
             <?php if (!$auth->isLoggedIn()): ?>
-                <a href="#" class="text-gray-600 hover:brand-text transition-all-300">Sign In</a>
-                <a href="#" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm">Sign Up</a>
+                <a href="/user/login" class="text-gray-600 hover:brand-text transition-all-300">Sign In</a>
+                <a href="/user/signup" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm">Sign Up</a>
             <?php else: ?>
                 <?php if ($auth->isAdminLoggedIn()): ?>
                     <a href="/admin/dashboard" class="border-2 border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:opacity-90 transition-all-300">Admin Dashboard</a>
                 <?php endif; ?>
                 <a href="#" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm">Dashboard</a>
                 <div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden;">
-                    <img src="/public/assets/upload/<?php echo $user->getProfilePic(); ?>"
+                    <img src="<?php echo $user->getProfilePic(); ?>"
                          alt="Profile pic"
                          style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
@@ -90,14 +90,28 @@ $auth = new Auth();
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden lg:hidden bg-white px-6 pb-4 space-y-2">
-        <a href="#" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Home</a>
+        <a href="/home" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Home</a>
         <a href="#services" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Services</a>
         <a href="#portfolio" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Portfolio</a>
         <a href="#testimonials" class="block text-gray-600 hover:brand-text transition-all-300 py-2">About Us</a>
         <a href="#" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Contact Us</a>
         <hr>
-        <a href="#" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Sign In</a>
-        <a href="#" class="block brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 text-center">Sign Up</a>
+        <?php if (!$auth->isLoggedIn()): ?>
+            <a href="/user/login" class="block text-gray-600 hover:brand-text transition-all-300 py-2">Sign In</a>
+            <a href="/user/signup" class="block brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 text-center">Sign Up</a>
+        <?php else: ?>
+            <div class="flex items-center space-x-4 pt-2">
+                <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
+                    <img src="<?php echo $user->getProfilePic(); ?>"
+                         alt="Profile pic"
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <a href="#" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm block w-full text-center">Dashboard</a>
+            </div>
+            <?php if ($auth->isAdminLoggedIn()): ?>
+                <a href="/admin/dashboard" class="block border-2 border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 text-center mt-2">Admin Dashboard</a>
+            <?php endif; ?>
+        <?php endif; ?>
     </div>
 </header>
 
