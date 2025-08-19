@@ -78,7 +78,7 @@ $auth = new Auth();
                 <?php if ($auth->isAdminLoggedIn()): ?>
                     <a href="/admin/dashboard" class="border-2 border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:opacity-90 transition-all-300">Admin Dashboard</a>
                 <?php endif; ?>
-                <a href="#" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm">Dashboard</a>
+                <a href="/user/my_booking" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm">Dashboard</a>
                 <div style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden;">
                     <img src="<?php echo $user->getProfilePic(); ?>"
                          alt="Profile pic"
@@ -106,7 +106,7 @@ $auth = new Auth();
                          alt="Profile pic"
                          style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
-                <a href="#" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm block w-full text-center">Dashboard</a>
+                <a href="/user/my_booking" class="brand-bg text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 shadow-sm block w-full text-center">Dashboard</a>
             </div>
             <?php if ($auth->isAdminLoggedIn()): ?>
                 <a href="/admin/dashboard" class="block border-2 border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:opacity-90 transition-all-300 text-center mt-2">Admin Dashboard</a>

@@ -83,6 +83,10 @@ $Bookings = (new \controller\Booking())->getAllByUser();
       <div style="overflow-y: scroll; height: calc(100vh - 100px);">
       <?php
 
+      if (empty($Bookings)) {
+          echo '<p>No bookings found.</p>';
+      }
+
       foreach ($Bookings as $booking) {
 
           echo '<div class="booking-card">';
