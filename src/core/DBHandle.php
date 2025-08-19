@@ -15,13 +15,35 @@ class DBHandle
     public static function connect(): PDO
     {
         if (self::$pdo === null) {
-            $host = $_ENV['DB_HOST'];
-            $dbname = $_ENV['DB_NAME'];
-            $username = $_ENV['DB_USER'];
-            $password = $_ENV['DB_PASS'];
-            $charset = $_ENV['DB_CHARSET'];
+            $dsn = "";
+            $username = "";
+            $password = "";
 
-            $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+            // Check if on Heroku (JAWSDB_URL is set)
+            $jawsdb_url = getenv("JAWSDB_URL");
+
+            if ($jawsdb_url) {
+                // Parse the Heroku-provided URL
+                $url_parts = parse_url($jawsdb_url);
+                $host = $url_parts['host'];
+                $dbname = ltrim($url_parts['path'], '/');
+                $username = $url_parts['user'];
+                $password = $url_parts['pass'];
+                $charset = 'utf8mb4'; // Heroku's default
+                $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+            } else {
+                // Fallback for local development using .env file
+                $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+                $dotenv->load();
+
+                $host = $_ENV['DB_HOST'];
+                $dbname = $_ENV['DB_NAME'];
+                $username = $_ENV['DB_USER'];
+                $password = $_ENV['DB_PASS'];
+                $charset = $_ENV['DB_CHARSET'];
+
+                $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+            }
 
             try {
                 self::$pdo = new PDO($dsn, $username, $password, [
