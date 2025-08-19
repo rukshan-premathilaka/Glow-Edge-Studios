@@ -30,5 +30,14 @@ class Auth
         }
     }
 
+    public function isLoggedIn(): bool
+    {
+        return isset($_SESSION['user']);
+    }
+
+    public function isAdminLoggedIn(): bool
+    {
+        return isset($_SESSION['user']) && in_array('admin', $_SESSION['user']['role'], true);
+    }
 
 }
